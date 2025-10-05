@@ -1,5 +1,5 @@
 targetScope = 'subscription'
-
+//this is a change in the "Updates" branch
 @description('Location for all resources')
 param location string = 'eastus2'
 
