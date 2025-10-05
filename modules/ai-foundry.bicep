@@ -110,7 +110,29 @@ resource openAI 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
   }
 }
 
-// AI Project (Standalone workspace with all dependencies)
+// AI Hub
+resource aiHub 'Microsoft.MachineLearningServices/workspaces@2024-10-01' = {
+  name: 'aih-${envPrefix}'
+  location: location
+  tags: tags
+  identity: {
+    type: 'SystemAssigned'
+  }
+  kind: 'Hub'
+  properties: {
+    friendlyName: 'AI Hub ${envPrefix}'
+    description: 'Azure AI Foundry Hub for ${envPrefix}'
+    storageAccount: storage.id
+    keyVault: keyVault.id
+    applicationInsights: appInsights.id
+    publicNetworkAccess: 'Disabled'
+    managedNetwork: {
+      isolationMode: 'AllowInternetOutbound'
+    }
+  }
+}
+
+// AI Project (associated with Hub)
 resource aiProject 'Microsoft.MachineLearningServices/workspaces@2024-10-01' = {
   name: 'aip-${envPrefix}'
   location: location
@@ -122,13 +144,8 @@ resource aiProject 'Microsoft.MachineLearningServices/workspaces@2024-10-01' = {
   properties: {
     friendlyName: 'AI Project ${envPrefix}'
     description: 'Azure AI Foundry Project for ${envPrefix}'
-    storageAccount: storage.id
-    keyVault: keyVault.id
-    applicationInsights: appInsights.id
+    hubResourceId: aiHub.id
     publicNetworkAccess: 'Disabled'
-    managedNetwork: {
-      isolationMode: 'AllowInternetOutbound'
-    }
   }
 }
 
