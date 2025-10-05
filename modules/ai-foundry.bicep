@@ -107,6 +107,7 @@ resource openAI 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
     networkAcls: {
       defaultAction: 'Deny'
     }
+    restore: true
   }
 }
 
