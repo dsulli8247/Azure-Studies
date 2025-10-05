@@ -92,21 +92,6 @@ resource storage 'Microsoft.Storage/storageAccounts@2023-05-01' = {
   }
 }
 
-// Container Registry
-resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-11-01-preview' = {
-  name: toLower('cr${replace(envPrefix, '-', '')}${uniqueString(resourceGroup().id, deploymentId)}')
-  location: location
-  tags: tags
-  sku: {
-    name: 'Premium'
-  }
-  properties: {
-    adminUserEnabled: false
-    publicNetworkAccess: 'Disabled'
-    networkRuleBypassOptions: 'AzureServices'
-  }
-}
-
 // Azure OpenAI Service (Cognitive Services)
 resource openAI 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
   name: toLower('aoai-${envPrefix}-${take(deploymentId, 8)}')
@@ -151,7 +136,7 @@ resource aiProject 'Microsoft.MachineLearningServices/workspaces@2024-10-01' = {
 // GPT Model Deployment
 resource modelDeployment 'Microsoft.CognitiveServices/accounts/deployments@2024-10-01' = {
   parent: openAI
-  name: 'gpt-4o-deployment'
+  name: 'gpt-5-deployment'
   sku: {
     name: 'Standard'
     capacity: modelCapacity
@@ -266,26 +251,6 @@ resource peStorageFileDnsGroup 'Microsoft.Network/privateEndpoints/privateDnsZon
         name: 'privatelink-file-core-windows-net'
         properties: {
           privateDnsZoneId: privateDnsZoneIds.file
-        }
-      }
-    ]
-  }
-}
-
-resource peContainerRegistry 'Microsoft.Network/privateEndpoints@2024-01-01' = {
-  name: 'pe-${containerRegistry.name}'
-  location: location
-  tags: tags
-  properties: {
-    subnet: {
-      id: privateEndpointSubnetId
-    }
-    privateLinkServiceConnections: [
-      {
-        name: 'pe-${containerRegistry.name}'
-        properties: {
-          privateLinkServiceId: containerRegistry.id
-          groupIds: ['registry']
         }
       }
     ]
