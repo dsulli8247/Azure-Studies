@@ -13,6 +13,6 @@ param privateEndpointSubnetPrefix = '10.100.1.0/24'
 param webAppSubnetPrefix = '10.100.2.0/24'
 param apimSubnetPrefix = '10.100.3.0/24'
 
-param gptModelName = 'gpt-4o'
+param gptModelName = 'gpt-5'
 param gptModelVersion = '2024-08-06'
 param modelCapacity = 10

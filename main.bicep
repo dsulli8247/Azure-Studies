@@ -35,7 +35,7 @@ param gptModelVersion string = '2024-08-06'
 param modelCapacity int = 10
 
 @description('Unique deployment ID to avoid naming conflicts with soft-deleted resources')
-param deploymentId string = utcNow()
+param deploymentId string = uniqueString(subscription().id, envPrefix)
 
 // Resource Group
 resource rg 'Microsoft.Resources/resourceGroups@2024-03-01' = {

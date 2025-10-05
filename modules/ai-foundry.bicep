@@ -23,7 +23,7 @@ param modelCapacity int
 param privateDnsZoneIds object
 
 @description('Unique deployment ID to avoid naming conflicts')
-param deploymentId string = uniqueString(utcNow())
+param deploymentId string
 
 // Application Insights & Log Analytics
 resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2023-09-01' = {
@@ -125,7 +125,6 @@ resource aiProject 'Microsoft.MachineLearningServices/workspaces@2024-10-01' = {
     storageAccount: storage.id
     keyVault: keyVault.id
     applicationInsights: appInsights.id
-    containerRegistry: containerRegistry.id
     publicNetworkAccess: 'Disabled'
     managedNetwork: {
       isolationMode: 'AllowInternetOutbound'
@@ -257,21 +256,6 @@ resource peStorageFileDnsGroup 'Microsoft.Network/privateEndpoints/privateDnsZon
   }
 }
 
-resource peContainerRegistryDnsGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2024-01-01' = {
-  parent: peContainerRegistry
-  name: 'default'
-  properties: {
-    privateDnsZoneConfigs: [
-      {
-        name: 'privatelink-azurecr-io'
-        properties: {
-          privateDnsZoneId: privateDnsZoneIds.containerRegistry
-        }
-      }
-    ]
-  }
-}
-
 resource peOpenAI 'Microsoft.Network/privateEndpoints@2024-01-01' = {
   name: 'pe-${openAI.name}'
   location: location
@@ -375,15 +359,7 @@ resource aiProjectKeyVaultRole 'Microsoft.Authorization/roleAssignments@2022-04-
   }
 }
 
-resource aiProjectContainerRegistryRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(aiProject.id, containerRegistry.id, 'AcrPull')
-  scope: containerRegistry
-  properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '7f951dda-4ed3-4680-a7ca-43fe172d538d') // AcrPull
-    principalId: aiProject.identity.principalId
-    principalType: 'ServicePrincipal'
-  }
-}
+
 
 resource aiProjectOpenAIRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(aiProject.id, openAI.id, 'CognitiveServicesOpenAIUser')
@@ -404,4 +380,3 @@ output openAIEndpoint string = openAI.properties.endpoint
 output modelDeploymentName string = modelDeployment.name
 output storageAccountId string = storage.id
 output keyVaultId string = keyVault.id
-output containerRegistryId string = containerRegistry.id
