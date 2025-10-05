@@ -14,5 +14,5 @@ param webAppSubnetPrefix = '10.100.2.0/24'
 param apimSubnetPrefix = '10.100.3.0/24'
 
 param gptModelName = 'gpt-5'
-param gptModelVersion = '2024-08-06'
+param gptModelVersion = '2025-08-07'
 param modelCapacity = 10

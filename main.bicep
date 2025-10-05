@@ -29,7 +29,7 @@ param apimSubnetPrefix string = '10.100.3.0/24'
 param gptModelName string = 'gpt-5'
 
 @description('GPT model version')
-param gptModelVersion string = '2024-08-06'
+param gptModelVersion string = '2025-08-07'
 
 @description('Model deployment capacity')
 param modelCapacity int = 10
