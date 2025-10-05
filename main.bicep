@@ -1,5 +1,5 @@
 targetScope = 'subscription'
-
+//adding a comment to test pull request and deployment
 @description('Location for all resources')
 param location string = 'eastus2'
 
