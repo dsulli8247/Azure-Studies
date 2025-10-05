@@ -355,40 +355,40 @@ resource peAIProjectDnsGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneG
   }
 }
 
-// RBAC Assignments
-resource aiProjectStorageRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(aiProject.id, storage.id, 'StorageBlobDataContributor')
+// RBAC Assignments for Hub
+resource aiHubStorageRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(aiHub.id, storage.id, 'StorageBlobDataContributor')
   scope: storage
   properties: {
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe') // Storage Blob Data Contributor
-    principalId: aiProject.identity.principalId
+    principalId: aiHub.identity.principalId
     principalType: 'ServicePrincipal'
   }
 }
 
-resource aiProjectKeyVaultRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(aiProject.id, keyVault.id, 'KeyVaultSecretsUser')
+resource aiHubKeyVaultRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(aiHub.id, keyVault.id, 'KeyVaultSecretsUser')
   scope: keyVault
   properties: {
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6') // Key Vault Secrets User
-    principalId: aiProject.identity.principalId
+    principalId: aiHub.identity.principalId
     principalType: 'ServicePrincipal'
   }
 }
 
-
-
-resource aiProjectOpenAIRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(aiProject.id, openAI.id, 'CognitiveServicesOpenAIUser')
+resource aiHubOpenAIRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(aiHub.id, openAI.id, 'CognitiveServicesOpenAIUser')
   scope: openAI
   properties: {
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd') // Cognitive Services OpenAI User
-    principalId: aiProject.identity.principalId
+    principalId: aiHub.identity.principalId
     principalType: 'ServicePrincipal'
   }
 }
 
 // Outputs
+output aiHubId string = aiHub.id
+output aiHubName string = aiHub.name
 output aiProjectId string = aiProject.id
 output aiProjectName string = aiProject.name
 output openAIId string = openAI.id
