@@ -1,0 +1,35 @@
+env:
+  AZURE_LOCATION: 'eastus'
+
+on: [push]
+name: Deploy Bicep to Subscription
+permissions:
+  id-token: write
+  contents: read
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+
+      # Checkout code
+    - uses: actions/checkout@main
+
+      # Log into Azure
+    - uses: azure/login@v1
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        auth-type: 'SERVICE_PRINCIPAL'
+
+      # Deploy Bicep file
+    - name: Deploy Bicep template at subscription scope
+      uses: azure/arm-deploy@v1
+      with:
+        scope: subscription
+        subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        #resourceGroupName: ${{ secrets.AZURE_RG }}
+        template: ./main.bicep
+        region: ${{ env.AZURE_LOCATION }} # Required for subscription-level deployments for metadata storage.
+        # parameters: 'location=eastus rgName=my-bicep-rg' # Optional: Update with parameters for your main.bicep
+        failOnStdErr: false
