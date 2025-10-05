@@ -26,10 +26,10 @@ param webAppSubnetPrefix string = '10.100.2.0/24'
 param apimSubnetPrefix string = '10.100.3.0/24'
 
 @description('GPT model name to deploy')
-param gptModelName string = 'gpt-5'
+param gptModelName string = 'gpt-4.1'
 
 @description('GPT model version')
-param gptModelVersion string = '2025-08-07'
+param gptModelVersion string = '2025-04-14'
 
 @description('Model deployment capacity')
 param modelCapacity int = 10
