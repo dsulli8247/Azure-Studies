@@ -314,8 +314,8 @@ resource peOpenAIDnsGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGrou
   }
 }
 
-resource peAIProject 'Microsoft.Network/privateEndpoints@2024-01-01' = {
-  name: 'pe-${aiProject.name}'
+resource peAIHub 'Microsoft.Network/privateEndpoints@2024-01-01' = {
+  name: 'pe-${aiHub.name}'
   location: location
   tags: tags
   properties: {
@@ -324,9 +324,9 @@ resource peAIProject 'Microsoft.Network/privateEndpoints@2024-01-01' = {
     }
     privateLinkServiceConnections: [
       {
-        name: 'pe-${aiProject.name}'
+        name: 'pe-${aiHub.name}'
         properties: {
-          privateLinkServiceId: aiProject.id
+          privateLinkServiceId: aiHub.id
           groupIds: ['amlworkspace']
         }
       }
@@ -334,8 +334,8 @@ resource peAIProject 'Microsoft.Network/privateEndpoints@2024-01-01' = {
   }
 }
 
-resource peAIProjectDnsGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2024-01-01' = {
-  parent: peAIProject
+resource peAIHubDnsGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2024-01-01' = {
+  parent: peAIHub
   name: 'default'
   properties: {
     privateDnsZoneConfigs: [
