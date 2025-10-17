@@ -110,28 +110,6 @@ resource openAI 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
   }
 }
 
-// AI Hub
-resource aiHub 'Microsoft.MachineLearningServices/workspaces@2024-10-01' = {
-  name: 'aih-${envPrefix}'
-  location: location
-  tags: tags
-  identity: {
-    type: 'SystemAssigned'
-  }
-  kind: 'Hub'
-  properties: {
-    friendlyName: 'AI Hub ${envPrefix}'
-    description: 'Azure AI Foundry Hub for ${envPrefix}'
-    storageAccount: storage.id
-    keyVault: keyVault.id
-    applicationInsights: appInsights.id
-    publicNetworkAccess: 'Disabled'
-    managedNetwork: {
-      isolationMode: 'AllowInternetOutbound'
-    }
-  }
-}
-
 // AI Project (associated with Hub)
 resource aiProject 'Microsoft.MachineLearningServices/workspaces@2024-10-01' = {
   name: 'aip-${envPrefix}'
@@ -144,9 +122,18 @@ resource aiProject 'Microsoft.MachineLearningServices/workspaces@2024-10-01' = {
   properties: {
     friendlyName: 'AI Project ${envPrefix}'
     description: 'Azure AI Foundry Project for ${envPrefix}'
-    hubResourceId: aiHub.id
+    storageAccount: storage.id // Project needs its own storage
+    keyVault: keyVault.id // Project needs its own key vault
+    applicationInsights: appInsights.id // Project needs its own application insights
     publicNetworkAccess: 'Disabled'
+    managedNetwork: { // Project needs managed network settings
+      isolationMode: 'AllowInternetOutbound'
+    }
   }
+  dependsOn: [
+    peOpenAI // Ensure OpenAI PE is created before the project
+    modelDeployment // Ensure the model is deployed before the project
+  ]
 }
 
 // GPT Model Deployment
@@ -314,81 +301,41 @@ resource peOpenAIDnsGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGrou
   }
 }
 
-resource peAIHub 'Microsoft.Network/privateEndpoints@2024-01-01' = {
-  name: 'pe-${aiHub.name}'
-  location: location
-  tags: tags
-  properties: {
-    subnet: {
-      id: privateEndpointSubnetId
-    }
-    privateLinkServiceConnections: [
-      {
-        name: 'pe-${aiHub.name}'
-        properties: {
-          privateLinkServiceId: aiHub.id
-          groupIds: ['amlworkspace']
-        }
-      }
-    ]
-  }
-}
-
-resource peAIHubDnsGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2024-01-01' = {
-  parent: peAIHub
-  name: 'default'
-  properties: {
-    privateDnsZoneConfigs: [
-      {
-        name: 'privatelink-api-azureml-ms'
-        properties: {
-          privateDnsZoneId: privateDnsZoneIds.apiAzureML
-        }
-      }
-      {
-        name: 'privatelink-notebooks-azure-net'
-        properties: {
-          privateDnsZoneId: privateDnsZoneIds.notebooks
-        }
-      }
-    ]
-  }
-}
-
 // RBAC Assignments for Hub
-resource aiHubStorageRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(aiHub.id, storage.id, 'StorageBlobDataContributor')
+// Removed AI Hub specific RBAC assignments
+
+// RBAC Assignments for Project
+resource aiProjectStorageRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(aiProject.id, storage.id, 'StorageBlobDataContributor')
   scope: storage
   properties: {
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe') // Storage Blob Data Contributor
-    principalId: aiHub.identity.principalId
+    principalId: aiProject.identity.principalId
     principalType: 'ServicePrincipal'
   }
 }
 
-resource aiHubKeyVaultRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(aiHub.id, keyVault.id, 'KeyVaultSecretsUser')
+resource aiProjectKeyVaultRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(aiProject.id, keyVault.id, 'KeyVaultSecretsUser')
   scope: keyVault
   properties: {
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6') // Key Vault Secrets User
-    principalId: aiHub.identity.principalId
+    principalId: aiProject.identity.principalId
     principalType: 'ServicePrincipal'
   }
 }
 
-resource aiHubOpenAIRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(aiHub.id, openAI.id, 'CognitiveServicesOpenAIUser')
+resource aiProjectOpenAIRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(aiProject.id, openAI.id, 'CognitiveServicesOpenAIUser')
   scope: openAI
   properties: {
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd') // Cognitive Services OpenAI User
-    principalId: aiHub.identity.principalId
+    principalId: aiProject.identity.principalId
     principalType: 'ServicePrincipal'
   }
 }
 
 // Outputs
-output aiHubId string = aiHub.id
-output aiHubName string = aiHub.name
 output aiProjectId string = aiProject.id
 output aiProjectName string = aiProject.name
 output openAIId string = openAI.id
