@@ -301,7 +301,7 @@ resource peOpenAIDnsGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGrou
 // RBAC Assignments for Hub
 // Removed AI Hub specific RBAC assignments
 
-RBAC Assignments for Project
+//RBAC Assignments for Project
 resource aiProjectStorageRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(aiProject.id, 'StorageBlobDataContributor')
   scope: storage
