@@ -151,6 +151,9 @@ resource modelDeployment 'Microsoft.CognitiveServices/accounts/deployments@2024-
     }
     raiPolicyName: 'Microsoft.Default'
   }
+  dependsOn: [
+    peOpenAI // Explicitly wait for the Private Endpoint to be created before deploying the model.
+  ]
 }
 
 // Private Endpoints
