@@ -308,7 +308,7 @@ resource peOpenAIDnsGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGrou
 
 // RBAC Assignments for Project
 resource aiProjectStorageRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(aiProject.id, storage.id, 'StorageBlobDataContributor')
+  name: guid(aiProject.id, 'StorageBlobDataContributor')
   scope: storage
   properties: {
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe') // Storage Blob Data Contributor
@@ -318,7 +318,7 @@ resource aiProjectStorageRole 'Microsoft.Authorization/roleAssignments@2022-04-0
 }
 
 resource aiProjectKeyVaultRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(aiProject.id, keyVault.id, 'KeyVaultSecretsUser')
+  name: guid(aiProject.id, 'KeyVaultSecretsUser')
   scope: keyVault
   properties: {
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6') // Key Vault Secrets User
@@ -328,7 +328,7 @@ resource aiProjectKeyVaultRole 'Microsoft.Authorization/roleAssignments@2022-04-
 }
 
 resource aiProjectOpenAIRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(aiProject.id, openAI.id, 'CognitiveServicesOpenAIUser')
+  name: guid(aiProject.id, 'CognitiveServicesOpenAIUser')
   scope: openAI
   properties: {
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd') // Cognitive Services OpenAI User
