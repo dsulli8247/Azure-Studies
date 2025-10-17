@@ -13,6 +13,12 @@ param vnetId string
 @description('Subnet ID for APIM integration')
 param apimSubnetId string
 
+@description('Subnet ID for the private endpoint')
+param privateEndpointSubnetId string
+
+@description('Private DNS Zone IDs for private endpoint integration')
+param privateDnsZoneIds object
+
 @description('Publisher email for APIM')
 param publisherEmail string
 
@@ -61,7 +67,26 @@ resource apim 'Microsoft.ApiManagement/service@2023-09-01-preview' = {
 //     principalType: 'ServicePrincipal'
 //   }
 // }
-
+// Private Endpoint for APIM Gateway
+resource peApimGateway 'Microsoft.Network/privateEndpoints@2024-01-01' = {
+  name: 'pe-${apim.name}-gateway'
+  location: location
+  tags: tags
+  properties: {
+    subnet: {
+      id: privateEndpointSubnetId
+    }
+    privateLinkServiceConnections: [
+      {
+        name: 'pe-${apim.name}-gateway'
+        properties: {
+          privateLinkServiceId: apim.id
+          groupIds: ['Gateway'] // The specific group ID for the APIM Gateway
+        }
+      }
+    ]
+  }
+}
 // // RBAC Assignments for APIM to access openAI (Cognitive Services OpenAI)
 // resource apimOpenAIRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
 //   name: guid(apim.outputs.apimId, aiFoundry.outputs.openAIId, 'CognitiveServicesOpenAIUser')

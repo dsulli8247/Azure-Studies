@@ -53,6 +53,12 @@ resource dnsZoneContainerRegistry 'Microsoft.Network/privateDnsZones@2024-06-01'
   tags: tags
 }
 
+resource dnsZoneApim 'Microsoft.Network/privateDnsZones@2024-06-01' = {
+  name: 'privatelink.azure-api.net'
+  location: 'global'
+  tags: tags
+}
+
 // VNet Links for all DNS Zones
 resource vnetLinkOpenAI 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2024-06-01' = {
   parent: dnsZoneOpenAI
@@ -158,6 +164,19 @@ resource vnetLinkContainerRegistry 'Microsoft.Network/privateDnsZones/virtualNet
   }
 }
 
+resource vnetLinkApim 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2024-06-01' = {
+  parent: dnsZoneApim
+  name: 'vnetlink-apim'
+  location: 'global'
+  tags: tags
+  properties: {
+    registrationEnabled: false
+    virtualNetwork: {
+      id: vnetId
+    }
+  }
+}
+
 // Output DNS Zone IDs for private endpoint creation
 output privateDnsZoneIds object = {
   openai: dnsZoneOpenAI.id
@@ -168,4 +187,5 @@ output privateDnsZoneIds object = {
   file: dnsZoneFileStorage.id
   keyVault: dnsZoneKeyVault.id
   containerRegistry: dnsZoneContainerRegistry.id
+  apim: dnsZoneApim.id
 }

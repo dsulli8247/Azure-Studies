@@ -103,6 +103,8 @@ module apim 'modules/apim.bicep' = {
     tags: tags
     vnetId: network.outputs.vnetId
     apimSubnetId: network.outputs.apimSubnetId
+    privateEndpointSubnetId: network.outputs.privateEndpointSubnetId
+    privateDnsZoneIds: dns.outputs.privateDnsZoneIds
     publisherEmail: publisherEmail
     publisherName: publisherName
   }
