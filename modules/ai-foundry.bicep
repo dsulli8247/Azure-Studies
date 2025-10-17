@@ -114,28 +114,20 @@ resource openAI 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
 }
 
 // AI Project (associated with Hub)
-resource aiProject 'Microsoft.MachineLearningServices/workspaces@2024-10-01' = {
+resource aiProject 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
   name: useUniqueWorkspaceName ? 'aip-${envPrefix}-${take(deploymentId, 5)}' : 'aip-${envPrefix}'
   location: location
   tags: tags
-  identity: {
-    type: 'SystemAssigned'
+  kind: 'CognitiveServices' // Changed to a general Cognitive Services resource
+  sku: {
+    name: 'S0'
   }
   properties: {
-    friendlyName: 'AI Project ${envPrefix}'
-    description: 'Azure AI Foundry Project for ${envPrefix}'
-    storageAccount: storage.id // Project needs its own storage
-    keyVault: keyVault.id // Project needs its own key vault
-    applicationInsights: appInsights.id // Project needs its own application insights
     publicNetworkAccess: 'Disabled'
-    managedNetwork: { // Project needs managed network settings
-      isolationMode: 'AllowInternetOutbound'
+    networkAcls: {
+      defaultAction: 'Deny'
     }
   }
-  dependsOn: [
-    peOpenAI // Ensure OpenAI PE is created before the project
-    modelDeployment // Ensure the model is deployed before the project
-  ]
 }
 
 // GPT Model Deployment
@@ -309,16 +301,16 @@ resource peOpenAIDnsGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGrou
 // RBAC Assignments for Hub
 // Removed AI Hub specific RBAC assignments
 
-// RBAC Assignments for Project
-// resource aiProjectStorageRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-//   name: guid(aiProject.id, 'StorageBlobDataContributor')
-//   scope: storage
-//   properties: {
-//     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe') // Storage Blob Data Contributor
-//     principalId: aiProject.identity.principalId
-//     principalType: 'ServicePrincipal'
-//   }
-// }
+RBAC Assignments for Project
+resource aiProjectStorageRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(aiProject.id, 'StorageBlobDataContributor')
+  scope: storage
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe') // Storage Blob Data Contributor
+    principalId: aiProject.identity.principalId
+    principalType: 'ServicePrincipal'
+  }
+}
 
 resource aiProjectKeyVaultRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(aiProject.id, 'KeyVaultSecretsUser')
