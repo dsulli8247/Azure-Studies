@@ -141,7 +141,7 @@ resource aiProject 'Microsoft.MachineLearningServices/workspaces@2024-10-01' = {
 // GPT Model Deployment
 resource modelDeployment 'Microsoft.CognitiveServices/accounts/deployments@2024-10-01' = {
   parent: openAI
-  name: 'gpt-41-deployment'
+  name: '${gptModelName}-deployment'
   sku: {
     name: 'GlobalStandard'
     capacity: modelCapacity
