@@ -83,6 +83,7 @@ module aiFoundry 'modules/ai-foundry.bicep' = {
     modelCapacity: modelCapacity
     privateDnsZoneIds: dns.outputs.privateDnsZoneIds
     deploymentId: deploymentId
+    useUniqueWorkspaceName: true // Set to true to avoid soft-delete issues during development
   }
 }
 

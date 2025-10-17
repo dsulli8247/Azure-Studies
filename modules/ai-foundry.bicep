@@ -25,6 +25,9 @@ param privateDnsZoneIds object
 @description('Unique deployment ID to avoid naming conflicts')
 param deploymentId string
 
+@description('If true, appends a unique string to the AI workspace name to avoid soft-delete conflicts.')
+param useUniqueWorkspaceName bool = false
+
 // Application Insights & Log Analytics
 resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2023-09-01' = {
   name: 'log-${envPrefix}'
@@ -112,7 +115,7 @@ resource openAI 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
 
 // AI Project (associated with Hub)
 resource aiProject 'Microsoft.MachineLearningServices/workspaces@2024-10-01' = {
-  name: 'aip-${envPrefix}'
+  name: useUniqueWorkspaceName ? 'aip-${envPrefix}-${take(deploymentId, 5)}' : 'aip-${envPrefix}'
   location: location
   tags: tags
   identity: {
