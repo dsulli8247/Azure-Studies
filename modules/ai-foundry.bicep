@@ -118,6 +118,9 @@ resource aiProject 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
   name: useUniqueWorkspaceName ? 'aip-${envPrefix}-${take(deploymentId, 5)}' : 'aip-${envPrefix}'
   location: location
   tags: tags
+  identity: {
+    type: 'SystemAssigned'
+  }
   kind: 'CognitiveServices' // Changed to a general Cognitive Services resource
   sku: {
     name: 'S0'
