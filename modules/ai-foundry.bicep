@@ -310,15 +310,15 @@ resource peOpenAIDnsGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGrou
 // Removed AI Hub specific RBAC assignments
 
 // RBAC Assignments for Project
-resource aiProjectStorageRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(aiProject.id, 'StorageBlobDataContributor')
-  scope: storage
-  properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe') // Storage Blob Data Contributor
-    principalId: aiProject.identity.principalId
-    principalType: 'ServicePrincipal'
-  }
-}
+// resource aiProjectStorageRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+//   name: guid(aiProject.id, 'StorageBlobDataContributor')
+//   scope: storage
+//   properties: {
+//     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe') // Storage Blob Data Contributor
+//     principalId: aiProject.identity.principalId
+//     principalType: 'ServicePrincipal'
+//   }
+// }
 
 resource aiProjectKeyVaultRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(aiProject.id, 'KeyVaultSecretsUser')
