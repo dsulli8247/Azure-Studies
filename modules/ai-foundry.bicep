@@ -118,7 +118,6 @@ resource aiProject 'Microsoft.MachineLearningServices/workspaces@2024-10-01' = {
   identity: {
     type: 'SystemAssigned'
   }
-  kind: 'Project'
   properties: {
     friendlyName: 'AI Project ${envPrefix}'
     description: 'Azure AI Foundry Project for ${envPrefix}'
