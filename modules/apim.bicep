@@ -19,6 +19,12 @@ param privateEndpointSubnetId string
 @description('Private DNS Zone IDs for private endpoint integration')
 param privateDnsZoneIds object
 
+@description('Unique deployment ID to avoid naming conflicts')
+param deploymentId string
+
+@description('If true, appends a unique string to the APIM name to avoid soft-delete conflicts.')
+param useUniqueName bool = false
+
 @description('Publisher email for APIM')
 param publisherEmail string
 
@@ -27,7 +33,7 @@ param publisherName string
 
 // Azure API Management
 resource apim 'Microsoft.ApiManagement/service@2023-09-01-preview' = {
-  name: 'apim-${envPrefix}'
+  name: useUniqueName ? 'apim-${envPrefix}-${take(deploymentId, 5)}' : 'apim-${envPrefix}'
   location: location
   tags: tags
   sku: {
