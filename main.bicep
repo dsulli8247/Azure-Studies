@@ -108,38 +108,7 @@ module apim 'modules/apim.bicep' = {
   }
 }
 
-// RBAC Assignments for APIM to access Key Vault
-resource apimKeyVaultRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(apim.outputs.apimId, aiFoundry.outputs.keyVaultId, 'KeyVaultSecretsUser')
-  scope: resource(aiFoundry.outputs.keyVaultId)
-  properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-08a-b874-0445c86b69e6') // Key Vault Secrets User
-    principalId: apim.outputs.apimPrincipalId
-    principalType: 'ServicePrincipal'
-  }
-}
 
-// RBAC Assignments for APIM to access aiProject (Cognitive Services)
-resource apimAiProjectRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(apim.outputs.apimId, aiFoundry.outputs.aiProjectId, 'CognitiveServicesUser')
-  scope: resource(aiFoundry.outputs.aiProjectId)
-  properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'a00ae02ab2e1447d9f891636572bb4e4') // Cognitive Services User
-    principalId: apim.outputs.apimPrincipalId
-    principalType: 'ServicePrincipal'
-  }
-}
-
-// RBAC Assignments for APIM to access openAI (Cognitive Services OpenAI)
-resource apimOpenAIRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(apim.outputs.apimId, aiFoundry.outputs.openAIId, 'CognitiveServicesOpenAIUser')
-  scope: resource(aiFoundry.outputs.openAIId)
-  properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd') // Cognitive Services OpenAI User
-    principalId: apim.outputs.apimPrincipalId
-    principalType: 'ServicePrincipal'
-  }
-}
 
 // Outputs
 output resourceGroupName string = rg.name
