@@ -121,7 +121,7 @@ resource aiProject 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
   identity: {
     type: 'SystemAssigned'
   }
-  kind: 'CognitiveServices' // Changed to a general Cognitive Services resource
+  kind: 'AIServices' // Changed to a general Cognitive Services resource
   sku: {
     name: 'S0'
   }
