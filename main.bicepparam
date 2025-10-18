@@ -1,6 +1,6 @@
 using './main.bicep'
 
-param location = 'eastus2'
+param location = 'eastus'
 param envPrefix = 'ai-poc-v2'
 param tags = {
   environment: 'poc'
@@ -15,7 +15,7 @@ param apimSubnetPrefix = '10.100.3.0/24'
 
 param gptModelName = 'gpt-4.1'
 param gptModelVersion = '2025-04-14'
-param modelCapacity = 10
+param modelCapacity = 1
 
 param publisherEmail = 'admin@example.com' // IMPORTANT: Replace with a valid email address
 param publisherName = 'AI Foundry Publisher'
