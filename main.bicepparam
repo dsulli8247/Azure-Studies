@@ -17,7 +17,7 @@ param gptModelName = 'gpt-4.1'
 param gptModelVersion = '2025-04-14'
 param modelCapacity = 10
 
-param publisherEmail = 'admin@example.com' // IMPORTANT: Replace with a valid email address
-param publisherName = 'AI Foundry Publisher'
+param publisherEmail = 'dsulli8247@gmail.com' // IMPORTANT: Replace with a valid email address
+param publisherName = 'David Sullivan'
 
 param useUniqueApimName = true
