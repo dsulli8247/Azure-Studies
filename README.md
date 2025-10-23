@@ -1,5 +1,5 @@
- # This is the header of the readme file.
+ # Sample Bicep Code for AI Incubator Deployment
 
- My plan is to make a study repo for Azure topics. If it works, I can share it with my friends.
+ This code will deploy resources required for an Aure IA Incubator based on Azure AI Foundry.
  
 
