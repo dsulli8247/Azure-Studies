@@ -1,7 +1,9 @@
 env:
   AZURE_LOCATION: 'eastus'
 
-on: [push]
+on:
+  workflow_dispatch:
+
 name: Deploy Bicep to Subscription
 permissions:
   id-token: write
