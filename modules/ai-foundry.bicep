@@ -126,6 +126,7 @@ resource aiProject 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
     name: 'S0'
   }
   properties: {
+    customSubDomainName: toLower('aip-${envPrefix}-${uniqueString(resourceGroup().id, deploymentId)}')
     publicNetworkAccess: 'Disabled'
     networkAcls: {
       defaultAction: 'Deny'

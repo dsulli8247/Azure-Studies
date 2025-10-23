@@ -5,7 +5,7 @@ param location string = 'eastus2'
 
 //modify for deployment type core or app
 param core bool = true
-param aiincubator bool = false
+param aiincubator bool = true
 
 @description('Environment prefix for naming')
 param envPrefix string = 'ai-poc-v2'
