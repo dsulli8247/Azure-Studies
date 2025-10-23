@@ -4,7 +4,7 @@ targetScope = 'subscription'
 param location string = 'eastus2'
 
 //modify for deployment type core or app
-param core bool = false
+param core bool = true
 param aiincubator bool = false
 
 @description('Environment prefix for naming')
@@ -60,7 +60,7 @@ module rgMain './modules/rg.bicep' = if (core==true){
 
 
 // Network Infrastructure
-module network 'modules/network.bicep' = {
+module network 'modules/network.bicep' = if (core==true){
   scope: resourceGroup('rg-${envPrefix}')
   name: 'network-deployment'
   params: {
@@ -75,7 +75,7 @@ module network 'modules/network.bicep' = {
 }
 
 // Private DNS Zones
-module dns 'modules/dns.bicep' = {
+module dns 'modules/dns.bicep' = if (core==true){
   scope: resourceGroup('rg-${envPrefix}')
   name: 'dns-deployment'
   params: {
@@ -85,7 +85,7 @@ module dns 'modules/dns.bicep' = {
 }
 
 // Azure AI Foundry Infrastructure
-module aiFoundry 'modules/ai-foundry.bicep' = {
+module aiFoundry 'modules/ai-foundry.bicep' = if (aiincubator==true){
   scope: resourceGroup('rg-${envPrefix}')
   name: 'ai-foundry-deployment'
   params: {
@@ -103,7 +103,7 @@ module aiFoundry 'modules/ai-foundry.bicep' = {
 }
 
 // Azure API Management
-module apim 'modules/apim.bicep' = {
+module apim 'modules/apim.bicep' = if (aiincubator==true){
   scope: resourceGroup('rg-${envPrefix}')
   name: 'apim-deployment'
   params: {
