@@ -96,22 +96,22 @@ resource storage 'Microsoft.Storage/storageAccounts@2023-05-01' = {
 }
 
 // Azure OpenAI Service (Cognitive Services)
-resource openAI 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
-  name: toLower('aoai-${envPrefix}-${take(deploymentId, 8)}')
-  location: location
-  tags: tags
-  kind: 'OpenAI'
-  sku: {
-    name: 'S0'
-  }
-  properties: {
-    customSubDomainName: toLower('aoai-${envPrefix}-${uniqueString(resourceGroup().id, deploymentId)}')
-    publicNetworkAccess: 'Disabled'
-    networkAcls: {
-      defaultAction: 'Deny'
-    }
-  }
-}
+// resource openAI 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
+//   name: toLower('aoai-${envPrefix}-${take(deploymentId, 8)}')
+//   location: location
+//   tags: tags
+//   kind: 'OpenAI'
+//   sku: {
+//     name: 'S0'
+//   }
+//   properties: {
+//     customSubDomainName: toLower('aoai-${envPrefix}-${uniqueString(resourceGroup().id, deploymentId)}')
+//     publicNetworkAccess: 'Disabled'
+//     networkAcls: {
+//       defaultAction: 'Deny'
+//     }
+//   }
+// }
 
 // AI Project (associated with Hub)
 resource aiProject 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
@@ -133,9 +133,9 @@ resource aiProject 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
   }
 }
 
-// GPT Model Deployment
+//GPT Model Deployment
 resource modelDeployment 'Microsoft.CognitiveServices/accounts/deployments@2024-10-01' = {
-  parent: openAI
+  parent: aiProject
   name: '${gptModelName}-deployment'
   sku: {
     name: 'GlobalStandard'
@@ -150,7 +150,7 @@ resource modelDeployment 'Microsoft.CognitiveServices/accounts/deployments@2024-
     raiPolicyName: 'Microsoft.Default'
   }
   dependsOn: [
-    peOpenAI // Explicitly wait for the Private Endpoint to be created before deploying the model.
+    peaiProject // Explicitly wait for the Private Endpoint to be created before deploying the model.
   ]
 }
 
@@ -260,8 +260,8 @@ resource peStorageFileDnsGroup 'Microsoft.Network/privateEndpoints/privateDnsZon
   }
 }
 
-resource peOpenAI 'Microsoft.Network/privateEndpoints@2024-01-01' = {
-  name: 'pe-${openAI.name}'
+resource peaiProject 'Microsoft.Network/privateEndpoints@2024-01-01' = {
+  name: 'pe-${aiProject.name}'
   location: location
   tags: tags
   properties: {
@@ -270,9 +270,9 @@ resource peOpenAI 'Microsoft.Network/privateEndpoints@2024-01-01' = {
     }
     privateLinkServiceConnections: [
       {
-        name: 'pe-${openAI.name}'
+        name: 'pe-${aiProject.name}'
         properties: {
-          privateLinkServiceId: openAI.id
+          privateLinkServiceId: aiProject.id
           groupIds: ['account']
         }
       }
@@ -281,7 +281,7 @@ resource peOpenAI 'Microsoft.Network/privateEndpoints@2024-01-01' = {
 }
 
 resource peOpenAIDnsGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2024-01-01' = {
-  parent: peOpenAI
+  parent: peaiProject
   name: 'default'
   properties: {
     privateDnsZoneConfigs: [
@@ -325,22 +325,22 @@ resource aiProjectKeyVaultRole 'Microsoft.Authorization/roleAssignments@2022-04-
   }
 }
 
-resource aiProjectOpenAIRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(aiProject.id, 'CognitiveServicesOpenAIUser')
-  scope: openAI
-  properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd') // Cognitive Services OpenAI User
-    principalId: aiProject.identity.principalId
-    principalType: 'ServicePrincipal'
-  }
-}
+// resource aiProjectOpenAIRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+//   name: guid(aiProject.id, 'CognitiveServicesOpenAIUser')
+//   scope: openAI
+//   properties: {
+//     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd') // Cognitive Services OpenAI User
+//     principalId: aiProject.identity.principalId
+//     principalType: 'ServicePrincipal'
+//   }
+// }
 
 // Outputs
 output aiProjectId string = aiProject.id
 output aiProjectName string = aiProject.name
-output openAIId string = openAI.id
-output openAIName string = openAI.name
-output openAIEndpoint string = openAI.properties.endpoint
+// output openAIId string = openAI.id
+// output openAIName string = openAI.name
+// output openAIEndpoint string = openAI.properties.endpoint
 output modelDeploymentName string = modelDeployment.name
 output storageAccountId string = storage.id
 output keyVaultId string = keyVault.id
