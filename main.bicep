@@ -3,6 +3,10 @@ targetScope = 'subscription'
 @description('Location for all resources')
 param location string = 'eastus2'
 
+//modify for deployment type core or app
+param core bool = false
+param aiincubator bool = false
+
 @description('Environment prefix for naming')
 param envPrefix string = 'ai-poc-v2'
 
@@ -46,16 +50,18 @@ param useUniqueApimName bool = false
 @description('Unique deployment ID to avoid naming conflicts with soft-deleted resources')
 param deploymentId string = newGuid() // Changed to newGuid() to ensure unique names for resources prone to soft-delete conflicts
 
+param utc string = utcNow()
+//vars
+
 // Resource Group
-resource rg 'Microsoft.Resources/resourceGroups@2024-03-01' = {
+module rgMain './modules/rg.bicep' = if (core==true){
   name: 'rg-${envPrefix}'
-  location: location
-  tags: tags
 }
+
 
 // Network Infrastructure
 module network 'modules/network.bicep' = {
-  scope: rg
+  scope: resourceGroup('rg-${envPrefix}')
   name: 'network-deployment'
   params: {
     location: location
@@ -70,7 +76,7 @@ module network 'modules/network.bicep' = {
 
 // Private DNS Zones
 module dns 'modules/dns.bicep' = {
-  scope: rg
+  scope: resourceGroup('rg-${envPrefix}')
   name: 'dns-deployment'
   params: {
     tags: tags
@@ -80,7 +86,7 @@ module dns 'modules/dns.bicep' = {
 
 // Azure AI Foundry Infrastructure
 module aiFoundry 'modules/ai-foundry.bicep' = {
-  scope: rg
+  scope: resourceGroup('rg-${envPrefix}')
   name: 'ai-foundry-deployment'
   params: {
     location: location
@@ -98,7 +104,7 @@ module aiFoundry 'modules/ai-foundry.bicep' = {
 
 // Azure API Management
 module apim 'modules/apim.bicep' = {
-  scope: rg
+  scope: resourceGroup('rg-${envPrefix}')
   name: 'apim-deployment'
   params: {
     location: location
@@ -118,7 +124,7 @@ module apim 'modules/apim.bicep' = {
 
 
 // Outputs
-output resourceGroupName string = rg.name
+output resourceGroupName string = rgMain.name
 output vnetId string = network.outputs.vnetId
 output aiProjectId string = aiFoundry.outputs.aiProjectId
 output modelDeploymentName string = aiFoundry.outputs.modelDeploymentName
