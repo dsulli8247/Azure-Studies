@@ -21,3 +21,4 @@ param publisherEmail = 'dsulli8247@gmail.com' // IMPORTANT: Replace with a valid
 param publisherName = 'David Sullivan'
 
 param useUniqueApimName = true
+
