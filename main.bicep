@@ -30,13 +30,22 @@ param webAppSubnetPrefix string = '10.100.2.0/24'
 param apimSubnetPrefix string = '10.100.3.0/24'
 
 @description('GPT model name to deploy')
-param gptModelName string = 'gpt-4.1'
+param gptModelName1 string = 'gpt-4.1'
 
 @description('GPT model version')
-param gptModelVersion string = '2025-04-14'
+param gptModelVersion1 string = '2025-04-14'
 
 @description('Model deployment capacity')
-param modelCapacity int = 10
+param modelCapacity1 int = 10
+
+@description('GPT model name to deploy')
+param gptModelName2 string = 'gpt-5'
+
+@description('GPT model version')
+param gptModelVersion2 string = '2025-08-07'
+
+@description('Model deployment capacity')
+param modelCapacity2 int = 10
 
 @description('Publisher email for APIM')
 param publisherEmail string
@@ -93,9 +102,12 @@ module aiFoundry 'modules/ai-foundry.bicep' = if (aiincubator==true){
     envPrefix: envPrefix
     tags: tags
     privateEndpointSubnetId: network.outputs.privateEndpointSubnetId
-    gptModelName: gptModelName
-    gptModelVersion: gptModelVersion
-    modelCapacity: modelCapacity
+    gptModelName1: gptModelName1
+    gptModelVersion1: gptModelVersion1
+    modelCapacity1: modelCapacity1
+    gptModelName2: gptModelName2
+    gptModelVersion2: gptModelVersion2
+    modelCapacity2: modelCapacity2
     privateDnsZoneIds: dns.outputs.privateDnsZoneIds
     deploymentId: deploymentId
     useUniqueWorkspaceName: true // Set to true to avoid soft-delete issues during development
@@ -127,7 +139,8 @@ module apim 'modules/apim.bicep' = if (aiincubator==true){
 output resourceGroupName string = rgMain.name
 output vnetId string = network.outputs.vnetId
 output aiProjectId string = aiFoundry.outputs.aiProjectId
-output modelDeploymentName string = aiFoundry.outputs.modelDeploymentName
+output modelDeploymentName1 string = aiFoundry.outputs.modelDeploymentName1
+output modelDeploymentName2 string = aiFoundry.outputs.modelDeploymentName2
 output apimId string = apim.outputs.apimId
 output apimName string = apim.outputs.apimName
 output apimGatewayUrl string = apim.outputs.apimGatewayUrl

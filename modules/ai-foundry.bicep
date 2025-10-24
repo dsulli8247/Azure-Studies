@@ -11,13 +11,22 @@ param tags object
 param privateEndpointSubnetId string
 
 @description('GPT model name to deploy')
-param gptModelName string
+param gptModelName1 string
 
 @description('GPT model version')
-param gptModelVersion string
+param gptModelVersion1 string
 
 @description('Model deployment capacity')
-param modelCapacity int
+param modelCapacity1 int
+
+@description('GPT model name to deploy')
+param gptModelName2 string
+
+@description('GPT model version')
+param gptModelVersion2 string
+
+@description('Model deployment capacity')
+param modelCapacity2 int
 
 @description('Private DNS Zone IDs')
 param privateDnsZoneIds object
@@ -135,18 +144,38 @@ resource aiProject 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
 }
 
 //GPT Model Deployment
-resource modelDeployment 'Microsoft.CognitiveServices/accounts/deployments@2024-10-01' = {
+resource modelDeployment1 'Microsoft.CognitiveServices/accounts/deployments@2024-10-01' = {
   parent: aiProject
-  name: '${gptModelName}-deployment'
+  name: '${gptModelName1}-deployment'
   sku: {
     name: 'GlobalStandard'
-    capacity: modelCapacity
+    capacity: modelCapacity1
   }
   properties: {
     model: {
       format: 'OpenAI'
-      name: gptModelName
-      version: gptModelVersion
+      name: gptModelName1
+      version: gptModelVersion1
+    }
+    raiPolicyName: 'Microsoft.Default'
+  }
+  dependsOn: [
+    peaiProject // Explicitly wait for the Private Endpoint to be created before deploying the model.
+  ]
+}
+
+resource modelDeployment2 'Microsoft.CognitiveServices/accounts/deployments@2024-10-01' = {
+  parent: aiProject
+  name: '${gptModelName2}-deployment'
+  sku: {
+    name: 'GlobalStandard'
+    capacity: modelCapacity2
+  }
+  properties: {
+    model: {
+      format: 'OpenAI'
+      name: gptModelName2
+      version: gptModelVersion2
     }
     raiPolicyName: 'Microsoft.Default'
   }
@@ -342,6 +371,7 @@ output aiProjectName string = aiProject.name
 // output openAIId string = openAI.id
 // output openAIName string = openAI.name
 // output openAIEndpoint string = openAI.properties.endpoint
-output modelDeploymentName string = modelDeployment.name
+output modelDeploymentName1 string = modelDeployment1.name
+output modelDeploymentName2 string = modelDeployment2.name
 output storageAccountId string = storage.id
 output keyVaultId string = keyVault.id
