@@ -37,7 +37,7 @@ resource apim 'Microsoft.ApiManagement/service@2023-09-01-preview' = {
   location: location
   tags: tags
   sku: {
-    name: 'Standardv2' // Switched back to Developer SKU to support VNet integration for network isolation.
+    name: 'StandardV2' // Switched back to Developer SKU to support VNet integration for network isolation.
     capacity: 1
   }
   identity: {
@@ -47,7 +47,7 @@ resource apim 'Microsoft.ApiManagement/service@2023-09-01-preview' = {
     publisherEmail: publisherEmail
     publisherName: publisherName
     //virtualNetworkType: 'Internal' // Internal VNet mode for network isolation
-    virtualNetworkType: 'Internal' // Internal VNet mode for network isolation
+    virtualNetworkType: 'External' // Internal VNet mode for network isolation
     virtualNetworkConfiguration: {
       subnetResourceId: apimSubnetId
     }

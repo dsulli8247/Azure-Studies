@@ -180,7 +180,7 @@ resource modelDeployment2 'Microsoft.CognitiveServices/accounts/deployments@2024
     raiPolicyName: 'Microsoft.Default'
   }
   dependsOn: [
-    peaiProject // Explicitly wait for the Private Endpoint to be created before deploying the model.
+    modelDeployment1 // Explicitly wait for the Private Endpoint to be created before deploying the model.
   ]
 }
 
