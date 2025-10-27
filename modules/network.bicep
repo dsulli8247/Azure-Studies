@@ -199,6 +199,13 @@ resource vnet 'Microsoft.Network/virtualNetworks@2024-01-01' = {
         name: 'snet-apim'
         properties: {
           addressPrefix: apimSubnetPrefix
+          delegations: [
+            { name: 'delegation'
+              properties: {
+                serviceName: 'Microsoft.Web/serverFarms'
+              }
+            }
+          ]
           networkSecurityGroup: {
             id: nsgApim.id
           }

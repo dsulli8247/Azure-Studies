@@ -37,7 +37,7 @@ resource apim 'Microsoft.ApiManagement/service@2023-09-01-preview' = {
   location: location
   tags: tags
   sku: {
-    name: 'Developer' // Switched back to Developer SKU to support VNet integration for network isolation.
+    name: 'Standardv2' // Switched back to Developer SKU to support VNet integration for network isolation.
     capacity: 1
   }
   identity: {
@@ -76,25 +76,25 @@ resource apim 'Microsoft.ApiManagement/service@2023-09-01-preview' = {
 //   }
 // }
 // Private Endpoint for APIM Gateway
-// resource peApimGateway 'Microsoft.Network/privateEndpoints@2024-01-01' = {
-//   name: 'pe-${apim.name}-gateway'
-//   location: location
-//   tags: tags
-//   properties: {
-//     subnet: {
-//       id: privateEndpointSubnetId
-//     }
-//     privateLinkServiceConnections: [
-//       {
-//         name: 'pe-${apim.name}-gateway'
-//         properties: {
-//           privateLinkServiceId: apim.id
-//           groupIds: ['Gateway'] // The specific group ID for the APIM Gateway
-//         }
-//       }
-//     ]
-//   }
-// }
+resource peApimGateway 'Microsoft.Network/privateEndpoints@2024-01-01' = {
+  name: 'pe-${apim.name}-gateway'
+  location: location
+  tags: tags
+  properties: {
+    subnet: {
+      id: privateEndpointSubnetId
+    }
+    privateLinkServiceConnections: [
+      {
+        name: 'pe-${apim.name}-gateway'
+        properties: {
+          privateLinkServiceId: apim.id
+          groupIds: ['Gateway'] // The specific group ID for the APIM Gateway
+        }
+      }
+    ]
+  }
+}
 
 // // RBAC Assignments for APIM to access openAI (Cognitive Services OpenAI)
 // resource apimOpenAIRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
