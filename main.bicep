@@ -81,6 +81,9 @@ module network 'modules/network.bicep' = if (core==true){
     webAppSubnetPrefix: webAppSubnetPrefix
     apimSubnetPrefix: apimSubnetPrefix
   }
+  dependsOn: [
+    rgMain
+  ]
 }
 
 // Private DNS Zones
@@ -91,6 +94,9 @@ module dns 'modules/dns.bicep' = if (core==true){
     tags: tags
     vnetId: network.outputs.vnetId
   }
+  dependsOn: [
+    rgMain
+  ]
 }
 
 // Azure AI Foundry Infrastructure
@@ -112,6 +118,9 @@ module aiFoundry 'modules/ai-foundry.bicep' = if (aiincubator==true){
     deploymentId: deploymentId
     useUniqueWorkspaceName: true // Set to true to avoid soft-delete issues during development
   }
+  dependsOn: [
+    rgMain
+  ]
 }
 
 // Azure API Management
@@ -131,6 +140,9 @@ module apim 'modules/apim.bicep' = if (aiincubator==true){
     publisherEmail: publisherEmail
     publisherName: publisherName
   }
+  dependsOn: [
+    rgMain
+  ]
 }
 
 
