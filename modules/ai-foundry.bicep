@@ -31,8 +31,8 @@ param modelCapacity2 int
 @description('Private DNS Zone IDs')
 param privateDnsZoneIds object
 
-@description('Unique deployment ID to avoid naming conflicts')
-param deploymentId string
+// @description('Unique deployment ID to avoid naming conflicts')
+// param deploymentId string
 
 @description('If true, appends a unique string to the AI workspace name to avoid soft-delete conflicts.')
 param useUniqueWorkspaceName bool = false
@@ -63,7 +63,7 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
 
 // Key Vault
 resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
-  name: 'kv-${uniqueString(resourceGroup().id, envPrefix, deploymentId)}'
+  name: 'kv-${envPrefix}'
   location: location
   tags: tags
   properties: {
@@ -73,8 +73,8 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
     }
     tenantId: subscription().tenantId
     enableRbacAuthorization: true
-    enableSoftDelete: true
-    softDeleteRetentionInDays: 7
+    enableSoftDelete: false // Disabled for dev/test to allow immediate reuse of name
+    enablePurgeProtection: false // Must be false if soft-delete is disabled
     publicNetworkAccess: 'Disabled'
     networkAcls: {
       bypass: 'AzureServices'
@@ -85,7 +85,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
 
 // Storage Account
 resource storage 'Microsoft.Storage/storageAccounts@2023-05-01' = {
-  name: toLower('st${replace(envPrefix, '-', '')}${uniqueString(resourceGroup().id, deploymentId)}')
+  name: toLower('st${replace(envPrefix, '-', '')}')
   location: location
   tags: tags
   sku: {
@@ -124,7 +124,7 @@ resource storage 'Microsoft.Storage/storageAccounts@2023-05-01' = {
 
 // AI Project (associated with Hub)
 resource aiProject 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
-  name: useUniqueWorkspaceName ? 'aip-${envPrefix}-${take(deploymentId, 5)}' : 'aip-${envPrefix}'
+  name: 'aip-${envPrefix}'
   location: location
   tags: tags
   identity: {
@@ -135,7 +135,11 @@ resource aiProject 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
     name: 'S0'
   }
   properties: {
-    customSubDomainName: toLower('aip-${envPrefix}-${uniqueString(resourceGroup().id, deploymentId)}')
+    friendlyName: 'AI Project ${envPrefix}'
+    description: 'Azure AI Foundry Project for ${envPrefix}'
+    storageAccount: storage.id
+    keyVault: keyVault.id
+    applicationInsights: appInsights.id
     publicNetworkAccess: 'Disabled'
     networkAcls: {
       defaultAction: 'Deny'

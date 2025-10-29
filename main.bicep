@@ -56,8 +56,8 @@ param publisherName string
 @description('If true, appends a unique string to the APIM name to avoid soft-delete conflicts.')
 param useUniqueApimName bool = false
 
-@description('Unique deployment ID to avoid naming conflicts with soft-deleted resources')
-param deploymentId string = newGuid() // Changed to newGuid() to ensure unique names for resources prone to soft-delete conflicts
+// @description('Unique deployment ID to avoid naming conflicts with soft-deleted resources')
+// param deploymentId string = newGuid() // Changed to newGuid() to ensure unique names for resources prone to soft-delete conflicts
 
 param utc string = utcNow()
 //vars
@@ -115,7 +115,6 @@ module aiFoundry 'modules/ai-foundry.bicep' = if (aiincubator==true){
     gptModelVersion2: gptModelVersion2
     modelCapacity2: modelCapacity2
     privateDnsZoneIds: dns.outputs.privateDnsZoneIds
-    deploymentId: deploymentId
     useUniqueWorkspaceName: true // Set to true to avoid soft-delete issues during development
   }
   dependsOn: [
@@ -135,7 +134,6 @@ module apim 'modules/apim.bicep' = if (aiincubator==true){
     apimSubnetId: network.outputs.apimSubnetId
     privateEndpointSubnetId: network.outputs.privateEndpointSubnetId
     privateDnsZoneIds: dns.outputs.privateDnsZoneIds
-    deploymentId: deploymentId
     useUniqueName: useUniqueApimName
     publisherEmail: publisherEmail
     publisherName: publisherName
