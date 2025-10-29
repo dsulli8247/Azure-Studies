@@ -63,7 +63,7 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
 
 // Key Vault
 resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
-  name: 'kv-${uniqueString(resourceGroup().id, envPrefix, deploymentId)}'
+  name: 'kv-${envPrefix}'
   location: location
   tags: tags
   properties: {
@@ -73,8 +73,8 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
     }
     tenantId: subscription().tenantId
     enableRbacAuthorization: true
-    enableSoftDelete: true
-    softDeleteRetentionInDays: 7
+    enableSoftDelete: false
+    //softDeleteRetentionInDays: 7
     publicNetworkAccess: 'Disabled'
     networkAcls: {
       bypass: 'AzureServices'
@@ -124,7 +124,7 @@ resource storage 'Microsoft.Storage/storageAccounts@2023-05-01' = {
 
 // AI Project (associated with Hub)
 resource aiProject 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
-  name: useUniqueWorkspaceName ? 'aip-${envPrefix}-${take(deploymentId, 5)}' : 'aip-${envPrefix}'
+  name: 'aip-${envPrefix}'
   location: location
   tags: tags
   identity: {
