@@ -47,8 +47,8 @@ resource apim 'Microsoft.ApiManagement/service@2023-09-01-preview' = {
   properties: {
     publisherEmail: publisherEmail
     publisherName: publisherName
-    //virtualNetworkType: 'Internal' // Internal VNet mode for network isolation
-    virtualNetworkType: 'External' // Internal VNet mode for network isolation
+    virtualNetworkType: 'Internal' // Internal VNet mode for network isolation
+    //virtualNetworkType: 'ExternalI' // Internal VNet mode for network isolation
     virtualNetworkConfiguration: {
       subnetResourceId: apimSubnetId
     }
