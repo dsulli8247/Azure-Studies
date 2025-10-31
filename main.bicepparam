@@ -26,15 +26,5 @@ param publisherName = 'David Sullivan'
 
 param useUniqueApimName = true
 
-param OnPremSubnets  = [
-  '10.62.0.0/16'
-  '10.65.0.0/16'
-  '10.72.0.0/16'
-  '10.75.0.0/16'
-  '10.52.0.0/16'
-  '10.55.0.0/16'      
-  '172.20.24.0/22' //VPN subnet EAST
-  '172.20.28.0/22' //VPN subnet WEST
-  '172.20.32.0/22' //VPN subnet PGH
-]
+
 
