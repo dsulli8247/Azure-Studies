@@ -19,6 +19,18 @@ param webAppSubnetPrefix string
 @description('APIM integration subnet prefix')
 param apimSubnetPrefix string
 
+param OnPremSubnets array = [
+  '10.62.0.0/16'
+  '10.65.0.0/16'
+  '10.72.0.0/16'
+  '10.75.0.0/16'
+  '10.52.0.0/16'
+  '10.55.0.0/16'      
+  '172.20.24.0/22' //VPN subnet EAST
+  '172.20.28.0/22' //VPN subnet WEST
+  '172.20.32.0/22' //VPN subnet PGH
+]
+
 // Network Security Group for Private Endpoints
 resource nsgPrivateEndpoints 'Microsoft.Network/networkSecurityGroups@2024-01-01' = {
   name: 'nsg-${envPrefix}-pe'
@@ -96,7 +108,7 @@ resource nsgApim 'Microsoft.Network/networkSecurityGroups@2024-01-01' = {
           protocol: 'Tcp'
           sourcePortRange: '*'
           destinationPortRanges: ['80', '443']
-          sourceAddressPrefix: 'Internet'
+          sourceAddressPrefix: OnPremSubnets
           destinationAddressPrefix: 'VirtualNetwork'
         }
       }
@@ -109,20 +121,7 @@ resource nsgApim 'Microsoft.Network/networkSecurityGroups@2024-01-01' = {
           protocol: 'Tcp'
           sourcePortRange: '*'
           destinationPortRange: '3443'
-          sourceAddressPrefix: 'ApiManagement'
-          destinationAddressPrefix: 'VirtualNetwork'
-        }
-      }
-      {
-        name: 'AllowAzureLoadBalancer'
-        properties: {
-          priority: 120
-          direction: 'Inbound'
-          access: 'Allow'
-          protocol: 'Tcp'
-          sourcePortRange: '*'
-          destinationPortRange: '6390'
-          sourceAddressPrefix: 'AzureLoadBalancer'
+          sourceAddressPrefix: OnPremSubnets
           destinationAddressPrefix: 'VirtualNetwork'
         }
       }

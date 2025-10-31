@@ -79,7 +79,7 @@ module network 'modules/network.bicep' = if (core==true){
     vnetAddressPrefix: vnetAddressPrefix
     privateEndpointSubnetPrefix: privateEndpointSubnetPrefix
     webAppSubnetPrefix: webAppSubnetPrefix
-    apimSubnetPrefix: apimSubnetPrefix
+    apimSubnetPrefix: apimSubnetPrefix    
   }
   dependsOn: [
     rgMain
