@@ -31,9 +31,11 @@ param publisherEmail string
 @description('Publisher name for APIM')
 param publisherName string
 
+param utc string = utcNow()
+
 // Azure API Management
 resource apim 'Microsoft.ApiManagement/service@2023-09-01-preview' = {
-  name: 'apim-${envPrefix}'
+  name: 'apim-${envPrefix}-${utc}'
   location: location
   tags: tags
   sku: {

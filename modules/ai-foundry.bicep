@@ -37,6 +37,8 @@ param deploymentId string
 @description('If true, appends a unique string to the AI workspace name to avoid soft-delete conflicts.')
 param useUniqueWorkspaceName bool = false
 
+param utc string = utcNow()
+
 // Application Insights & Log Analytics
 resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2023-09-01' = {
   name: 'log-${envPrefix}'
@@ -124,7 +126,7 @@ resource storage 'Microsoft.Storage/storageAccounts@2023-05-01' = {
 
 // AI Project (associated with Hub)
 resource aiProject 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
-  name: 'aip-${envPrefix}'
+  name: 'aip-${envPrefix}-${utc}'
   location: location
   tags: tags
   identity: {

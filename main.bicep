@@ -59,7 +59,7 @@ param useUniqueApimName bool = false
 @description('Unique deployment ID to avoid naming conflicts with soft-deleted resources')
 param deploymentId string = newGuid() // Changed to newGuid() to ensure unique names for resources prone to soft-delete conflicts
 
-param utc string = utcNow()
+//param utc string = utcNow()
 //vars
 
 // Resource Group
