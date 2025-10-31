@@ -59,6 +59,9 @@ param useUniqueApimName bool = false
 @description('Unique deployment ID to avoid naming conflicts with soft-deleted resources')
 param deploymentId string = newGuid() // Changed to newGuid() to ensure unique names for resources prone to soft-delete conflicts
 
+@description('Array of on-premise subnet address prefixes to allow access from.')
+param onPremSubnets array = []
+
 //param utc string = utcNow()
 //vars
 
@@ -79,7 +82,8 @@ module network 'modules/network.bicep' = if (core==true){
     vnetAddressPrefix: vnetAddressPrefix
     privateEndpointSubnetPrefix: privateEndpointSubnetPrefix
     webAppSubnetPrefix: webAppSubnetPrefix
-    apimSubnetPrefix: apimSubnetPrefix    
+    apimSubnetPrefix: apimSubnetPrefix
+    OnPremSubnets: onPremSubnets
   }
   dependsOn: [
     rgMain

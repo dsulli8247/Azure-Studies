@@ -19,17 +19,8 @@ param webAppSubnetPrefix string
 @description('APIM integration subnet prefix')
 param apimSubnetPrefix string
 
-param OnPremSubnets array = [
-  '10.62.0.0/16'
-  '10.65.0.0/16'
-  '10.72.0.0/16'
-  '10.75.0.0/16'
-  '10.52.0.0/16'
-  '10.55.0.0/16'      
-  '172.20.24.0/22' //VPN subnet EAST
-  '172.20.28.0/22' //VPN subnet WEST
-  '172.20.32.0/22' //VPN subnet PGH
-]
+@description('Array of on-premise subnet address prefixes to allow access from.')
+param OnPremSubnets array = []
 
 // Network Security Group for Private Endpoints
 resource nsgPrivateEndpoints 'Microsoft.Network/networkSecurityGroups@2024-01-01' = {
@@ -108,7 +99,7 @@ resource nsgApim 'Microsoft.Network/networkSecurityGroups@2024-01-01' = {
           protocol: 'Tcp'
           sourcePortRange: '*'
           destinationPortRanges: ['80', '443']
-          sourceAddressPrefix: 'VirtualNetwork'
+          sourceAddressPrefixes: union(['VirtualNetwork'], OnPremSubnets)
           destinationAddressPrefix: 'VirtualNetwork'
         }
       }
