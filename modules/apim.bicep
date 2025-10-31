@@ -39,7 +39,8 @@ resource apim 'Microsoft.ApiManagement/service@2023-09-01-preview' = {
   location: location
   tags: tags
   sku: {
-    name: 'StandardV2' // Switched back to Developer SKU to support VNet integration for network isolation.
+    name: 'PremiumV2'
+    //name: 'StandardV2' // Switched back to Developer SKU to support VNet integration for network isolation.
     //name: 'Developer'
     capacity: 1
   }
