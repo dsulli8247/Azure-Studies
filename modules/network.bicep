@@ -19,6 +19,9 @@ param webAppSubnetPrefix string
 @description('APIM integration subnet prefix')
 param apimSubnetPrefix string
 
+@description('Array of on-premise subnet address prefixes to allow access from')
+param OnPremSubnets array
+
 
 
 // Network Security Group for Private Endpoints
