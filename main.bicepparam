@@ -26,7 +26,6 @@ param publisherName = 'David Sullivan'
 
 param useUniqueApimName = true
 
-@description('Array of on-premise subnet address prefixes to allow access from.')
 param OnPremSubnets = [
   '10.62.0.0/16'
   '10.65.0.0/16'
