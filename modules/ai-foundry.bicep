@@ -11,13 +11,22 @@ param tags object
 param privateEndpointSubnetId string
 
 @description('GPT model name to deploy')
-param gptModelName string
+param gptModelName1 string
 
 @description('GPT model version')
-param gptModelVersion string
+param gptModelVersion1 string
 
 @description('Model deployment capacity')
-param modelCapacity int
+param modelCapacity1 int
+
+@description('GPT model name to deploy')
+param gptModelName2 string
+
+@description('GPT model version')
+param gptModelVersion2 string
+
+@description('Model deployment capacity')
+param modelCapacity2 int
 
 @description('Private DNS Zone IDs')
 param privateDnsZoneIds object
@@ -27,6 +36,8 @@ param deploymentId string
 
 @description('If true, appends a unique string to the AI workspace name to avoid soft-delete conflicts.')
 param useUniqueWorkspaceName bool = false
+
+param utc string = utcNow()
 
 // Application Insights & Log Analytics
 resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2023-09-01' = {
@@ -54,7 +65,7 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
 
 // Key Vault
 resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
-  name: 'kv-${uniqueString(resourceGroup().id, envPrefix, deploymentId)}'
+  name: 'kv-${envPrefix}'
   location: location
   tags: tags
   properties: {
@@ -64,8 +75,8 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
     }
     tenantId: subscription().tenantId
     enableRbacAuthorization: true
-    enableSoftDelete: true
-    softDeleteRetentionInDays: 7
+    enableSoftDelete: false
+    //softDeleteRetentionInDays: 7
     publicNetworkAccess: 'Disabled'
     networkAcls: {
       bypass: 'AzureServices'
@@ -96,26 +107,26 @@ resource storage 'Microsoft.Storage/storageAccounts@2023-05-01' = {
 }
 
 // Azure OpenAI Service (Cognitive Services)
-resource openAI 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
-  name: toLower('aoai-${envPrefix}-${take(deploymentId, 8)}')
-  location: location
-  tags: tags
-  kind: 'OpenAI'
-  sku: {
-    name: 'S0'
-  }
-  properties: {
-    customSubDomainName: toLower('aoai-${envPrefix}-${uniqueString(resourceGroup().id, deploymentId)}')
-    publicNetworkAccess: 'Disabled'
-    networkAcls: {
-      defaultAction: 'Deny'
-    }
-  }
-}
+// resource openAI 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
+//   name: toLower('aoai-${envPrefix}-${take(deploymentId, 8)}')
+//   location: location
+//   tags: tags
+//   kind: 'OpenAI'
+//   sku: {
+//     name: 'S0'
+//   }
+//   properties: {
+//     customSubDomainName: toLower('aoai-${envPrefix}-${uniqueString(resourceGroup().id, deploymentId)}')
+//     publicNetworkAccess: 'Disabled'
+//     networkAcls: {
+//       defaultAction: 'Deny'
+//     }
+//   }
+// }
 
 // AI Project (associated with Hub)
 resource aiProject 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
-  name: useUniqueWorkspaceName ? 'aip-${envPrefix}-${take(deploymentId, 5)}' : 'aip-${envPrefix}'
+  name: 'aip-${envPrefix}-${utc}'
   location: location
   tags: tags
   identity: {
@@ -126,6 +137,7 @@ resource aiProject 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
     name: 'S0'
   }
   properties: {
+    customSubDomainName: toLower('aip-${envPrefix}-${uniqueString(resourceGroup().id, deploymentId)}')
     publicNetworkAccess: 'Disabled'
     networkAcls: {
       defaultAction: 'Deny'
@@ -133,24 +145,44 @@ resource aiProject 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
   }
 }
 
-// GPT Model Deployment
-resource modelDeployment 'Microsoft.CognitiveServices/accounts/deployments@2024-10-01' = {
-  parent: openAI
-  name: '${gptModelName}-deployment'
+//GPT Model Deployment
+resource modelDeployment1 'Microsoft.CognitiveServices/accounts/deployments@2024-10-01' = {
+  parent: aiProject
+  name: '${gptModelName1}-deployment'
   sku: {
     name: 'GlobalStandard'
-    capacity: modelCapacity
+    capacity: modelCapacity1
   }
   properties: {
     model: {
       format: 'OpenAI'
-      name: gptModelName
-      version: gptModelVersion
+      name: gptModelName1
+      version: gptModelVersion1
     }
     raiPolicyName: 'Microsoft.Default'
   }
   dependsOn: [
-    peOpenAI // Explicitly wait for the Private Endpoint to be created before deploying the model.
+    peaiProject // Explicitly wait for the Private Endpoint to be created before deploying the model.
+  ]
+}
+
+resource modelDeployment2 'Microsoft.CognitiveServices/accounts/deployments@2024-10-01' = {
+  parent: aiProject
+  name: '${gptModelName2}-deployment'
+  sku: {
+    name: 'GlobalStandard'
+    capacity: modelCapacity2
+  }
+  properties: {
+    model: {
+      format: 'OpenAI'
+      name: gptModelName2
+      version: gptModelVersion2
+    }
+    raiPolicyName: 'Microsoft.Default'
+  }
+  dependsOn: [
+    modelDeployment1 // Explicitly wait for the Private Endpoint to be created before deploying the model.
   ]
 }
 
@@ -260,8 +292,8 @@ resource peStorageFileDnsGroup 'Microsoft.Network/privateEndpoints/privateDnsZon
   }
 }
 
-resource peOpenAI 'Microsoft.Network/privateEndpoints@2024-01-01' = {
-  name: 'pe-${openAI.name}'
+resource peaiProject 'Microsoft.Network/privateEndpoints@2024-01-01' = {
+  name: 'pe-${aiProject.name}'
   location: location
   tags: tags
   properties: {
@@ -270,9 +302,9 @@ resource peOpenAI 'Microsoft.Network/privateEndpoints@2024-01-01' = {
     }
     privateLinkServiceConnections: [
       {
-        name: 'pe-${openAI.name}'
+        name: 'pe-${aiProject.name}'
         properties: {
-          privateLinkServiceId: openAI.id
+          privateLinkServiceId: aiProject.id
           groupIds: ['account']
         }
       }
@@ -281,7 +313,7 @@ resource peOpenAI 'Microsoft.Network/privateEndpoints@2024-01-01' = {
 }
 
 resource peOpenAIDnsGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2024-01-01' = {
-  parent: peOpenAI
+  parent: peaiProject
   name: 'default'
   properties: {
     privateDnsZoneConfigs: [
@@ -325,22 +357,23 @@ resource aiProjectKeyVaultRole 'Microsoft.Authorization/roleAssignments@2022-04-
   }
 }
 
-resource aiProjectOpenAIRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(aiProject.id, 'CognitiveServicesOpenAIUser')
-  scope: openAI
-  properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd') // Cognitive Services OpenAI User
-    principalId: aiProject.identity.principalId
-    principalType: 'ServicePrincipal'
-  }
-}
+// resource aiProjectOpenAIRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+//   name: guid(aiProject.id, 'CognitiveServicesOpenAIUser')
+//   scope: openAI
+//   properties: {
+//     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd') // Cognitive Services OpenAI User
+//     principalId: aiProject.identity.principalId
+//     principalType: 'ServicePrincipal'
+//   }
+// }
 
 // Outputs
 output aiProjectId string = aiProject.id
 output aiProjectName string = aiProject.name
-output openAIId string = openAI.id
-output openAIName string = openAI.name
-output openAIEndpoint string = openAI.properties.endpoint
-output modelDeploymentName string = modelDeployment.name
+// output openAIId string = openAI.id
+// output openAIName string = openAI.name
+// output openAIEndpoint string = openAI.properties.endpoint
+output modelDeploymentName1 string = modelDeployment1.name
+output modelDeploymentName2 string = modelDeployment2.name
 output storageAccountId string = storage.id
 output keyVaultId string = keyVault.id

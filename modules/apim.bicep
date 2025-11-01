@@ -31,13 +31,17 @@ param publisherEmail string
 @description('Publisher name for APIM')
 param publisherName string
 
+param utc string = utcNow()
+
 // Azure API Management
 resource apim 'Microsoft.ApiManagement/service@2023-09-01-preview' = {
-  name: useUniqueName ? 'apim-${envPrefix}-${take(deploymentId, 5)}' : 'apim-${envPrefix}'
+  name: 'apim-${envPrefix}-${utc}'
   location: location
   tags: tags
   sku: {
-    name: 'Developer' // Use Developer for testing, Premium for production VNet integration
+    
+    name: 'StandardV2' // Switched back to Developer SKU to support VNet integration for network isolation.
+    //name: 'Developer'
     capacity: 1
   }
   identity: {
@@ -46,12 +50,14 @@ resource apim 'Microsoft.ApiManagement/service@2023-09-01-preview' = {
   properties: {
     publisherEmail: publisherEmail
     publisherName: publisherName
-    virtualNetworkType: 'Internal' // Internal VNet mode for network isolation
+    //virtualNetworkType: 'Internal' // Internal VNet mode for network isolation
+    virtualNetworkType: 'External' // Internal VNet mode for network isolation
     virtualNetworkConfiguration: {
       subnetResourceId: apimSubnetId
     }
   }
 }
+
 // // RBAC Assignments for APIM to access Key Vault
 // resource apimKeyVaultRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
 //   name: guid(apim.outputs.apimId, aiFoundry.outputs.keyVaultId, 'KeyVaultSecretsUser')
@@ -93,6 +99,7 @@ resource peApimGateway 'Microsoft.Network/privateEndpoints@2024-01-01' = {
     ]
   }
 }
+
 // // RBAC Assignments for APIM to access openAI (Cognitive Services OpenAI)
 // resource apimOpenAIRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
 //   name: guid(apim.outputs.apimId, aiFoundry.outputs.openAIId, 'CognitiveServicesOpenAIUser')

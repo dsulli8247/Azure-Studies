@@ -3,6 +3,10 @@ targetScope = 'subscription'
 @description('Location for all resources')
 param location string = 'eastus2'
 
+//modify for deployment type core or app
+param core bool = true
+param aiincubator bool = true
+
 @description('Environment prefix for naming')
 param envPrefix string = 'ai-poc-v2'
 
@@ -26,13 +30,22 @@ param webAppSubnetPrefix string = '10.100.2.0/24'
 param apimSubnetPrefix string = '10.100.3.0/24'
 
 @description('GPT model name to deploy')
-param gptModelName string = 'gpt-4.1'
+param gptModelName1 string = 'gpt-4.1'
 
 @description('GPT model version')
-param gptModelVersion string = '2025-04-14'
+param gptModelVersion1 string = '2025-04-14'
 
 @description('Model deployment capacity')
-param modelCapacity int = 10
+param modelCapacity1 int = 10
+
+@description('GPT model name to deploy')
+param gptModelName2 string = 'gpt-5'
+
+@description('GPT model version')
+param gptModelVersion2 string = '2025-08-07'
+
+@description('Model deployment capacity')
+param modelCapacity2 int = 10
 
 @description('Publisher email for APIM')
 param publisherEmail string
@@ -46,16 +59,20 @@ param useUniqueApimName bool = false
 @description('Unique deployment ID to avoid naming conflicts with soft-deleted resources')
 param deploymentId string = newGuid() // Changed to newGuid() to ensure unique names for resources prone to soft-delete conflicts
 
+param OnPremSubnets array
+
+//param utc string = utcNow()
+//vars
+
 // Resource Group
-resource rg 'Microsoft.Resources/resourceGroups@2024-03-01' = {
+module rgMain './modules/rg.bicep' = if (core==true){
   name: 'rg-${envPrefix}'
-  location: location
-  tags: tags
 }
 
+
 // Network Infrastructure
-module network 'modules/network.bicep' = {
-  scope: rg
+module network 'modules/network.bicep' = if (core==true){
+  scope: resourceGroup('rg-${envPrefix}')
   name: 'network-deployment'
   params: {
     location: location
@@ -65,40 +82,53 @@ module network 'modules/network.bicep' = {
     privateEndpointSubnetPrefix: privateEndpointSubnetPrefix
     webAppSubnetPrefix: webAppSubnetPrefix
     apimSubnetPrefix: apimSubnetPrefix
+    OnPremSubnets: OnPremSubnets
   }
+  dependsOn: [
+    rgMain
+  ]
 }
 
 // Private DNS Zones
-module dns 'modules/dns.bicep' = {
-  scope: rg
+module dns 'modules/dns.bicep' = if (core==true){
+  scope: resourceGroup('rg-${envPrefix}')
   name: 'dns-deployment'
   params: {
     tags: tags
     vnetId: network.outputs.vnetId
   }
+  dependsOn: [
+    rgMain
+  ]
 }
 
 // Azure AI Foundry Infrastructure
-module aiFoundry 'modules/ai-foundry.bicep' = {
-  scope: rg
+module aiFoundry 'modules/ai-foundry.bicep' = if (aiincubator==true){
+  scope: resourceGroup('rg-${envPrefix}')
   name: 'ai-foundry-deployment'
   params: {
     location: location
     envPrefix: envPrefix
     tags: tags
     privateEndpointSubnetId: network.outputs.privateEndpointSubnetId
-    gptModelName: gptModelName
-    gptModelVersion: gptModelVersion
-    modelCapacity: modelCapacity
+    gptModelName1: gptModelName1
+    gptModelVersion1: gptModelVersion1
+    modelCapacity1: modelCapacity1
+    gptModelName2: gptModelName2
+    gptModelVersion2: gptModelVersion2
+    modelCapacity2: modelCapacity2
     privateDnsZoneIds: dns.outputs.privateDnsZoneIds
     deploymentId: deploymentId
     useUniqueWorkspaceName: true // Set to true to avoid soft-delete issues during development
   }
+  dependsOn: [
+    rgMain
+  ]
 }
 
 // Azure API Management
-module apim 'modules/apim.bicep' = {
-  scope: rg
+module apim 'modules/apim.bicep' = if (aiincubator==true){
+  scope: resourceGroup('rg-${envPrefix}')
   name: 'apim-deployment'
   params: {
     location: location
@@ -113,15 +143,19 @@ module apim 'modules/apim.bicep' = {
     publisherEmail: publisherEmail
     publisherName: publisherName
   }
+  dependsOn: [
+    rgMain
+  ]
 }
 
 
 
 // Outputs
-output resourceGroupName string = rg.name
+output resourceGroupName string = rgMain.name
 output vnetId string = network.outputs.vnetId
 output aiProjectId string = aiFoundry.outputs.aiProjectId
-output modelDeploymentName string = aiFoundry.outputs.modelDeploymentName
+output modelDeploymentName1 string = aiFoundry.outputs.modelDeploymentName1
+output modelDeploymentName2 string = aiFoundry.outputs.modelDeploymentName2
 output apimId string = apim.outputs.apimId
 output apimName string = apim.outputs.apimName
 output apimGatewayUrl string = apim.outputs.apimGatewayUrl

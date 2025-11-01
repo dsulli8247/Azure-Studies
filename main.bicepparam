@@ -1,6 +1,6 @@
 using './main.bicep'
 
-param location = 'eastus'
+param location = 'eastus2'
 param envPrefix = 'ai-poc-v2'
 param tags = {
   environment: 'poc'
@@ -13,11 +13,29 @@ param privateEndpointSubnetPrefix = '10.100.1.0/24'
 param webAppSubnetPrefix = '10.100.2.0/24'
 param apimSubnetPrefix = '10.100.3.0/24'
 
-param gptModelName = 'gpt-4.1'
-param gptModelVersion = '2025-04-14'
-param modelCapacity = 10
+param gptModelName1 = 'gpt-4.1'
+param gptModelVersion1 = '2025-04-14'
+param modelCapacity1 = 10
+
+param gptModelName2 = 'gpt-5'
+param gptModelVersion2 = '2025-08-07'
+param modelCapacity2 = 10
 
 param publisherEmail = 'dsulli8247@gmail.com' // IMPORTANT: Replace with a valid email address
 param publisherName = 'David Sullivan'
 
 param useUniqueApimName = true
+
+@description('Array of on-premise subnet address prefixes to allow access from.')
+param OnPremSubnets = [
+  '10.62.0.0/16'
+  '10.65.0.0/16'
+  '10.72.0.0/16'
+  '10.75.0.0/16'
+  '10.52.0.0/16'
+  '10.55.0.0/16'      
+  '172.20.24.0/22' //VPN subnet EAST
+  '172.20.28.0/22' //VPN subnet WEST
+  '172.20.32.0/22' //VPN subnet PGH
+]
+

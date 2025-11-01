@@ -19,6 +19,11 @@ param webAppSubnetPrefix string
 @description('APIM integration subnet prefix')
 param apimSubnetPrefix string
 
+@description('Array of on-premise subnet address prefixes to allow access from')
+param OnPremSubnets array
+
+
+
 // Network Security Group for Private Endpoints
 resource nsgPrivateEndpoints 'Microsoft.Network/networkSecurityGroups@2024-01-01' = {
   name: 'nsg-${envPrefix}-pe'
@@ -96,7 +101,7 @@ resource nsgApim 'Microsoft.Network/networkSecurityGroups@2024-01-01' = {
           protocol: 'Tcp'
           sourcePortRange: '*'
           destinationPortRanges: ['80', '443']
-          sourceAddressPrefix: 'Internet'
+          sourceAddressPrefixes: union(['VirtualNetwork'], OnPremSubnets)
           destinationAddressPrefix: 'VirtualNetwork'
         }
       }
@@ -109,20 +114,7 @@ resource nsgApim 'Microsoft.Network/networkSecurityGroups@2024-01-01' = {
           protocol: 'Tcp'
           sourcePortRange: '*'
           destinationPortRange: '3443'
-          sourceAddressPrefix: 'ApiManagement'
-          destinationAddressPrefix: 'VirtualNetwork'
-        }
-      }
-      {
-        name: 'AllowAzureLoadBalancer'
-        properties: {
-          priority: 120
-          direction: 'Inbound'
-          access: 'Allow'
-          protocol: 'Tcp'
-          sourcePortRange: '*'
-          destinationPortRange: '6390'
-          sourceAddressPrefix: 'AzureLoadBalancer'
+          sourceAddressPrefix: 'VirtualNetwork'
           destinationAddressPrefix: 'VirtualNetwork'
         }
       }
@@ -199,6 +191,13 @@ resource vnet 'Microsoft.Network/virtualNetworks@2024-01-01' = {
         name: 'snet-apim'
         properties: {
           addressPrefix: apimSubnetPrefix
+          delegations: [
+            { name: 'delegation'
+              properties: {
+                serviceName: 'Microsoft.Web/serverFarms'
+              }
+            }
+          ]
           networkSecurityGroup: {
             id: nsgApim.id
           }
