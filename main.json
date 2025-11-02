@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.38.33.27573",
-      "templateHash": "7589945427772684676"
+      "version": "0.38.5.1644",
+      "templateHash": "5754545788471622707"
     }
   },
   "parameters": {
@@ -160,8 +160,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.38.33.27573",
-              "templateHash": "16996738630776697803"
+              "version": "0.38.5.1644",
+              "templateHash": "3130833027220610145"
             }
           },
           "parameters": {
@@ -246,8 +246,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.38.33.27573",
-              "templateHash": "10824633875061972669"
+              "version": "0.38.5.1644",
+              "templateHash": "12383704284713153081"
             }
           },
           "parameters": {
@@ -382,7 +382,7 @@
                         "80",
                         "443"
                       ],
-                      "sourceAddressPrefixes": "[union(createArray('VirtualNetwork'), parameters('OnPremSubnets'))]",
+                      "sourceAddressPrefixes": "[parameters('OnPremSubnets')]",
                       "destinationAddressPrefix": "VirtualNetwork"
                     }
                   },
@@ -395,7 +395,7 @@
                       "protocol": "Tcp",
                       "sourcePortRange": "*",
                       "destinationPortRange": "3443",
-                      "sourceAddressPrefix": "VirtualNetwork",
+                      "sourceAddressPrefixes": "[parameters('OnPremSubnets')]",
                       "destinationAddressPrefix": "VirtualNetwork"
                     }
                   },
@@ -547,8 +547,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.38.33.27573",
-              "templateHash": "7934613628408623736"
+              "version": "0.38.5.1644",
+              "templateHash": "7170333018561565451"
             }
           },
           "parameters": {
@@ -855,8 +855,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.38.33.27573",
-              "templateHash": "14152111116872135356"
+              "version": "0.38.5.1644",
+              "templateHash": "7563905229198993748"
             }
           },
           "parameters": {
@@ -1377,8 +1377,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.38.33.27573",
-              "templateHash": "16464104270705701637"
+              "version": "0.38.5.1644",
+              "templateHash": "12351049562891096867"
             }
           },
           "parameters": {
