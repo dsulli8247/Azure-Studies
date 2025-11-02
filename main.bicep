@@ -114,9 +114,9 @@ module aiFoundry 'modules/ai-foundry.bicep' = if (aiincubator==true){
     gptModelName1: gptModelName1
     gptModelVersion1: gptModelVersion1
     modelCapacity1: modelCapacity1
-    gptModelName2: gptModelName2
-    gptModelVersion2: gptModelVersion2
-    modelCapacity2: modelCapacity2
+    // gptModelName2: gptModelName2
+    // gptModelVersion2: gptModelVersion2
+    // modelCapacity2: modelCapacity2
     privateDnsZoneIds: dns.outputs.privateDnsZoneIds
     deploymentId: deploymentId
     useUniqueWorkspaceName: true // Set to true to avoid soft-delete issues during development
@@ -155,7 +155,7 @@ output resourceGroupName string = rgMain.name
 output vnetId string = network.outputs.vnetId
 output aiProjectId string = aiFoundry.outputs.aiProjectId
 output modelDeploymentName1 string = aiFoundry.outputs.modelDeploymentName1
-output modelDeploymentName2 string = aiFoundry.outputs.modelDeploymentName2
+// output modelDeploymentName2 string = aiFoundry.outputs.modelDeploymentName2
 output apimId string = apim.outputs.apimId
 output apimName string = apim.outputs.apimName
 output apimGatewayUrl string = apim.outputs.apimGatewayUrl

@@ -19,14 +19,14 @@ param gptModelVersion1 string
 @description('Model deployment capacity')
 param modelCapacity1 int
 
-@description('GPT model name to deploy')
-param gptModelName2 string
+// @description('GPT model name to deploy')
+// param gptModelName2 string
 
-@description('GPT model version')
-param gptModelVersion2 string
+// @description('GPT model version')
+// param gptModelVersion2 string
 
-@description('Model deployment capacity')
-param modelCapacity2 int
+// @description('Model deployment capacity')
+// param modelCapacity2 int
 
 @description('Private DNS Zone IDs')
 param privateDnsZoneIds object
@@ -374,6 +374,6 @@ output aiProjectName string = aiProject.name
 // output openAIName string = openAI.name
 // output openAIEndpoint string = openAI.properties.endpoint
 output modelDeploymentName1 string = modelDeployment1.name
-output modelDeploymentName2 string = modelDeployment2.name
+// output modelDeploymentName2 string = modelDeployment2.name
 output storageAccountId string = storage.id
 output keyVaultId string = keyVault.id
