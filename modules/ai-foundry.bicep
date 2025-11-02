@@ -166,25 +166,25 @@ resource modelDeployment1 'Microsoft.CognitiveServices/accounts/deployments@2024
   ]
 }
 
-resource modelDeployment2 'Microsoft.CognitiveServices/accounts/deployments@2024-10-01' = {
-  parent: aiProject
-  name: '${gptModelName2}-deployment'
-  sku: {
-    name: 'GlobalStandard'
-    capacity: modelCapacity2
-  }
-  properties: {
-    model: {
-      format: 'OpenAI'
-      name: gptModelName2
-      version: gptModelVersion2
-    }
-    raiPolicyName: 'Microsoft.Default'
-  }
-  dependsOn: [
-    modelDeployment1 // Explicitly wait for the Private Endpoint to be created before deploying the model.
-  ]
-}
+// resource modelDeployment2 'Microsoft.CognitiveServices/accounts/deployments@2024-10-01' = {
+//   parent: aiProject
+//   name: '${gptModelName2}-deployment'
+//   sku: {
+//     name: 'GlobalStandard'
+//     capacity: modelCapacity2
+//   }
+//   properties: {
+//     model: {
+//       format: 'OpenAI'
+//       name: gptModelName2
+//       version: gptModelVersion2
+//     }
+//     raiPolicyName: 'Microsoft.Default'
+//   }
+//   dependsOn: [
+//     modelDeployment1 // Explicitly wait for the Private Endpoint to be created before deploying the model.
+//   ]
+// }
 
 // Private Endpoints
 resource peKeyVault 'Microsoft.Network/privateEndpoints@2024-01-01' = {
