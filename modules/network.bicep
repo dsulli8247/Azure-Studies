@@ -101,7 +101,7 @@ resource nsgApim 'Microsoft.Network/networkSecurityGroups@2024-01-01' = {
           protocol: 'Tcp'
           sourcePortRange: '*'
           destinationPortRanges: ['80', '443']
-          sourceAddressPrefixes: union(['VirtualNetwork'], OnPremSubnets)
+          sourceAddressPrefixes: OnPremSubnets
           destinationAddressPrefix: 'VirtualNetwork'
         }
       }
@@ -114,7 +114,7 @@ resource nsgApim 'Microsoft.Network/networkSecurityGroups@2024-01-01' = {
           protocol: 'Tcp'
           sourcePortRange: '*'
           destinationPortRange: '3443'
-          sourceAddressPrefix: 'VirtualNetwork'
+          sourceAddressPrefixes: OnPremSubnets
           destinationAddressPrefix: 'VirtualNetwork'
         }
       }
