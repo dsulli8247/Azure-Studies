@@ -14,15 +14,23 @@ tableNames=$(az monitor log-analytics workspace table list \
     --query '[].name' \
     -o tsv)
 
-for tableName in $tableNames; do
+IFS=$'\n' # Set Internal Field Separator to newline to handle table names correctly
+
+for tableName in $(echo "$tableNames" | tr -d '\r'); do
+    # Skip tables that are not meant to be updated this way
+    if [[ "$tableName" == *_SRCH ]] || [[ "$tableName" == *_RST ]]; then
+        echo "Skipping non-configurable table: $tableName"
+        continue
+    fi
+
     echo "Configuring table: $tableName"
     az monitor log-analytics workspace table update \
         --resource-group "$resourceGroupName" \
         --workspace-name "$workspaceName" \
         --name "$tableName" \
         --retention-time "$analyticsRetentionDays" \
-        --total-retention-time "$totalRetentionDays" --no-wait
-    if [ $? -eq 0 ]; then
+        --total-retention-time "$totalRetentionDays" --no-wait > /dev/null 2>&1
+    if [ $? -eq 0 ]; then # Check the exit code of the az command
         echo "Successfully updated $tableName."
     else
         echo "Failed to update $tableName."
