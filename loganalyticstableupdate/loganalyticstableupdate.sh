@@ -21,7 +21,7 @@ for tableName in $tableNames; do
         --workspace-name "$workspaceName" \
         --name "$tableName" \
         --retention-time "$analyticsRetentionDays" \
-        --total-retention-time "$totalRetentionDays"
+        --total-retention-time "$totalRetentionDays" --no-wait
     if [ $? -eq 0 ]; then
         echo "Successfully updated $tableName."
     else
