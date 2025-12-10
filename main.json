@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.38.5.1644",
-      "templateHash": "5754545788471622707"
+      "templateHash": "9164646685065957596"
     }
   },
   "parameters": {
@@ -830,15 +830,6 @@
           "modelCapacity1": {
             "value": "[parameters('modelCapacity1')]"
           },
-          "gptModelName2": {
-            "value": "[parameters('gptModelName2')]"
-          },
-          "gptModelVersion2": {
-            "value": "[parameters('gptModelVersion2')]"
-          },
-          "modelCapacity2": {
-            "value": "[parameters('modelCapacity2')]"
-          },
           "privateDnsZoneIds": {
             "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('rg-{0}', parameters('envPrefix'))), 'Microsoft.Resources/deployments', 'dns-deployment'), '2025-04-01').outputs.privateDnsZoneIds.value]"
           },
@@ -856,7 +847,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.38.5.1644",
-              "templateHash": "7563905229198993748"
+              "templateHash": "2536783096517769878"
             }
           },
           "parameters": {
@@ -897,24 +888,6 @@
               }
             },
             "modelCapacity1": {
-              "type": "int",
-              "metadata": {
-                "description": "Model deployment capacity"
-              }
-            },
-            "gptModelName2": {
-              "type": "string",
-              "metadata": {
-                "description": "GPT model name to deploy"
-              }
-            },
-            "gptModelVersion2": {
-              "type": "string",
-              "metadata": {
-                "description": "GPT model version"
-              }
-            },
-            "modelCapacity2": {
               "type": "int",
               "metadata": {
                 "description": "Model deployment capacity"
@@ -1055,27 +1028,6 @@
               "dependsOn": [
                 "[resourceId('Microsoft.CognitiveServices/accounts', format('aip-{0}-{1}', parameters('envPrefix'), parameters('utc')))]",
                 "[resourceId('Microsoft.Network/privateEndpoints', format('pe-{0}', format('aip-{0}-{1}', parameters('envPrefix'), parameters('utc'))))]"
-              ]
-            },
-            {
-              "type": "Microsoft.CognitiveServices/accounts/deployments",
-              "apiVersion": "2024-10-01",
-              "name": "[format('{0}/{1}', format('aip-{0}-{1}', parameters('envPrefix'), parameters('utc')), format('{0}-deployment', parameters('gptModelName2')))]",
-              "sku": {
-                "name": "GlobalStandard",
-                "capacity": "[parameters('modelCapacity2')]"
-              },
-              "properties": {
-                "model": {
-                  "format": "OpenAI",
-                  "name": "[parameters('gptModelName2')]",
-                  "version": "[parameters('gptModelVersion2')]"
-                },
-                "raiPolicyName": "Microsoft.Default"
-              },
-              "dependsOn": [
-                "[resourceId('Microsoft.CognitiveServices/accounts', format('aip-{0}-{1}', parameters('envPrefix'), parameters('utc')))]",
-                "[resourceId('Microsoft.CognitiveServices/accounts/deployments', format('aip-{0}-{1}', parameters('envPrefix'), parameters('utc')), format('{0}-deployment', parameters('gptModelName1')))]"
               ]
             },
             {
@@ -1303,10 +1255,6 @@
             "modelDeploymentName1": {
               "type": "string",
               "value": "[format('{0}-deployment', parameters('gptModelName1'))]"
-            },
-            "modelDeploymentName2": {
-              "type": "string",
-              "value": "[format('{0}-deployment', parameters('gptModelName2'))]"
             },
             "storageAccountId": {
               "type": "string",
@@ -1547,10 +1495,6 @@
     "modelDeploymentName1": {
       "type": "string",
       "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('rg-{0}', parameters('envPrefix'))), 'Microsoft.Resources/deployments', 'ai-foundry-deployment'), '2025-04-01').outputs.modelDeploymentName1.value]"
-    },
-    "modelDeploymentName2": {
-      "type": "string",
-      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('rg-{0}', parameters('envPrefix'))), 'Microsoft.Resources/deployments', 'ai-foundry-deployment'), '2025-04-01').outputs.modelDeploymentName2.value]"
     },
     "apimId": {
       "type": "string",
