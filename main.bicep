@@ -57,7 +57,7 @@ param publisherName string
 param useUniqueApimName bool = false
 
 @description('Unique deployment ID to avoid naming conflicts with soft-deleted resources')
-param deploymentId string = newGuid() // Changed to newGuid() to ensure unique names for resources prone to soft-delete conflicts
+param deploymentId string = substring(uniqueString(subscription().subscriptionId, envPrefix), 0, 6) // formatted to be deterministic
 
 param OnPremSubnets array
 
