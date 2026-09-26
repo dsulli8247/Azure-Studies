@@ -4,6 +4,18 @@ variable "azure_location" {
   default     = "eastus"
 }
 
+variable "azure_subscription_id" {
+  description = "Azure subscription id used by the AzureRM provider."
+  type        = string
+  default     = null
+}
+
+variable "azure_tenant_id" {
+  description = "Azure tenant id used by the AzureRM provider."
+  type        = string
+  default     = null
+}
+
 variable "aws_region" {
   description = "Default AWS region for resources."
   type        = string
