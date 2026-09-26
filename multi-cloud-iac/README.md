@@ -18,6 +18,8 @@ Starter project for a Dev Container-based Terraform development environment targ
    - `aws --version`
    - `gcloud --version`
 4. Go to `terraform` and run:
+   - `cp terraform.tfvars.example terraform.tfvars`
+   - Edit `terraform.tfvars` and set `gcp_project_id`
    - `terraform init`
    - `terraform validate`
 
