@@ -35,8 +35,9 @@ RUN set -eux \
 RUN set -eux \
     && EXPECTED_MICROSOFT_FPR="BC528686B50D79E339D3721CEB3E94ADBE1229CF" \
     && curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor >/usr/share/keyrings/microsoft-archive-keyring.gpg \
-    && ACTUAL_MICROSOFT_FPR="$(gpg --show-keys --with-colons /usr/share/keyrings/microsoft-archive-keyring.gpg | awk -F: '/^fpr:/ {print $10; exit}')" \
-    && [ "${ACTUAL_MICROSOFT_FPR}" = "${EXPECTED_MICROSOFT_FPR}" ] \
+    && gpg --show-keys --with-colons /usr/share/keyrings/microsoft-archive-keyring.gpg \
+       | awk -F: '$1 == "fpr" {print $10}' \
+       | grep -Fxq "${EXPECTED_MICROSOFT_FPR}" \
     && ARCH="$(dpkg --print-architecture)" \
     && AZ_REPO="$(lsb_release -cs)" \
     && echo "deb [arch=${ARCH} signed-by=/usr/share/keyrings/microsoft-archive-keyring.gpg] https://packages.microsoft.com/repos/azure-cli/ ${AZ_REPO} main" >/etc/apt/sources.list.d/azure-cli.list \
@@ -52,8 +53,9 @@ RUN set -eux \
 RUN set -eux \
     && EXPECTED_GCLOUD_FPR="35BAA0B33E9EB396F59CA838C0BA5CE6DC6315A3" \
     && curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor >/usr/share/keyrings/cloud.google.gpg \
-    && ACTUAL_GCLOUD_FPR="$(gpg --show-keys --with-colons /usr/share/keyrings/cloud.google.gpg | awk -F: '/^fpr:/ {print $10; exit}')" \
-    && [ "${ACTUAL_GCLOUD_FPR}" = "${EXPECTED_GCLOUD_FPR}" ] \
+    && gpg --show-keys --with-colons /usr/share/keyrings/cloud.google.gpg \
+       | awk -F: '$1 == "fpr" {print $10}' \
+       | grep -Fxq "${EXPECTED_GCLOUD_FPR}" \
     && echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" >/etc/apt/sources.list.d/google-cloud-sdk.list \
     && apt-get update \
     && apt-get install -y --no-install-recommends google-cloud-cli \
