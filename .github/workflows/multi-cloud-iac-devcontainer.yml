@@ -12,6 +12,9 @@ on:
       - "multi-cloud-iac/**"
       - ".github/workflows/multi-cloud-iac-devcontainer.yml"
 
+permissions:
+  contents: read
+
 jobs:
   build-devcontainer:
     runs-on: ubuntu-latest
