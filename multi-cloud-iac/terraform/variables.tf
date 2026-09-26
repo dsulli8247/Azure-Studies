@@ -1,8 +1,3 @@
-variable "azure_subscription_id" {
-  description = "Azure subscription id used by the AzureRM provider."
-  type        = string
-}
-
 variable "aws_region" {
   description = "Default AWS region for resources."
   type        = string
@@ -12,6 +7,7 @@ variable "aws_region" {
 variable "gcp_project_id" {
   description = "GCP project id used by the Google provider."
   type        = string
+  default     = "your-gcp-project-id"
 }
 
 variable "gcp_region" {

@@ -34,7 +34,8 @@ RUN set -eux \
 
 RUN set -eux \
     && EXPECTED_MICROSOFT_FPR="BC528686B50D79E339D3721CEB3E94ADBE1229CF" \
-    && AZ_REPO="jammy" \
+    && AZ_REPO="$(lsb_release -cs)" \
+    && if [ "${AZ_REPO}" != "jammy" ] && [ "${AZ_REPO}" != "noble" ]; then AZ_REPO="jammy"; fi \
     && curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor >/usr/share/keyrings/microsoft-archive-keyring.gpg \
     && gpg --show-keys --with-colons /usr/share/keyrings/microsoft-archive-keyring.gpg \
        | awk -F: '$1 == "fpr" {print $10}' \
