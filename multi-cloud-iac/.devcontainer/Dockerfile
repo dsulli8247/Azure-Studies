@@ -16,22 +16,16 @@ RUN set -eux \
 
 RUN set -eux \
     && TERRAFORM_VERSION="1.9.8" \
-    && EXPECTED_HASHICORP_FPR="798AEC654E5C15428C8E42EEAA16FCBCA621E701" \
+    && TERRAFORM_SHA256_AMD64="186e0145f5e5f2eb97cbd785bc78f21bae4ef15119349f6ad4fa535b83b10df8" \
+    && TERRAFORM_SHA256_ARM64="f85868798834558239f6148834884008f2722548f84034c9b0f62934b2d73ebb" \
     && ARCH="$(dpkg --print-architecture)" \
-    && if [ "${ARCH}" = "amd64" ]; then TF_ARCH="amd64"; \
-       elif [ "${ARCH}" = "arm64" ]; then TF_ARCH="arm64"; \
+    && if [ "${ARCH}" = "amd64" ]; then TF_ARCH="amd64"; EXPECTED_TERRAFORM_SHA256="${TERRAFORM_SHA256_AMD64}"; \
+       elif [ "${ARCH}" = "arm64" ]; then TF_ARCH="arm64"; EXPECTED_TERRAFORM_SHA256="${TERRAFORM_SHA256_ARM64}"; \
        else echo "Unsupported architecture: ${ARCH}" && exit 1; fi \
-    && curl -fsSL https://apt.releases.hashicorp.com/gpg | gpg --dearmor >/tmp/hashicorp-keyring.gpg \
-    && read -r HASHICORP_PRIMARY_KEY_COUNT HASHICORP_PRIMARY_FPR < <(gpg --show-keys --with-colons /tmp/hashicorp-keyring.gpg | awk -F: '$1 == "pub" {want_fpr = 1; next} want_fpr && $1 == "fpr" {count++; if (count == 1) {first = $10}; want_fpr = 0} END {print count + 0, first}') \
-    && [ "${HASHICORP_PRIMARY_KEY_COUNT}" -eq 1 ] \
-    && [ "${HASHICORP_PRIMARY_FPR}" = "${EXPECTED_HASHICORP_FPR}" ] \
     && curl -fsSL "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_${TF_ARCH}.zip" -o /tmp/terraform.zip \
-    && curl -fsSL "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_SHA256SUMS" -o /tmp/terraform_SHA256SUMS \
-    && curl -fsSL "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_SHA256SUMS.sig" -o /tmp/terraform_SHA256SUMS.sig \
-    && gpg --batch --no-default-keyring --keyring /tmp/hashicorp-keyring.gpg --verify /tmp/terraform_SHA256SUMS.sig /tmp/terraform_SHA256SUMS \
-    && grep -E "^[a-f0-9]{64}[[:space:]]+\\*?terraform_${TERRAFORM_VERSION}_linux_${TF_ARCH}\\.zip$" /tmp/terraform_SHA256SUMS | sha256sum -c - \
+    && echo "${EXPECTED_TERRAFORM_SHA256}  /tmp/terraform.zip" | sha256sum -c - \
     && unzip -q /tmp/terraform.zip -d /usr/local/bin \
-    && rm -f /tmp/terraform.zip /tmp/terraform_SHA256SUMS /tmp/terraform_SHA256SUMS.sig /tmp/hashicorp-keyring.gpg
+    && rm -f /tmp/terraform.zip
 
 RUN set -eux \
     && EXPECTED_MICROSOFT_FPR="BC528686B50D79E339D3721CEB3E94ADBE1229CF" \
