@@ -14,6 +14,5 @@
       ]
     }
   },
-  "postCreateCommand": "terraform -version && az version && aws --version && gcloud --version",
   "remoteUser": "vscode"
 }

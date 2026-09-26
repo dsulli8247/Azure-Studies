@@ -16,11 +16,14 @@ RUN set -eux \
 
 RUN set -eux \
     && TERRAFORM_VERSION="1.9.8" \
+    && EXPECTED_HASHICORP_FPR="798AEC654E5C15428C8E42EEAA16FCBCA621E701" \
     && ARCH="$(dpkg --print-architecture)" \
     && if [ "${ARCH}" = "amd64" ]; then TF_ARCH="amd64"; \
        elif [ "${ARCH}" = "arm64" ]; then TF_ARCH="arm64"; \
        else echo "Unsupported architecture: ${ARCH}" && exit 1; fi \
     && curl -fsSL https://apt.releases.hashicorp.com/gpg | gpg --dearmor >/tmp/hashicorp-keyring.gpg \
+    && ACTUAL_HASHICORP_FPR="$(gpg --show-keys --with-colons /tmp/hashicorp-keyring.gpg | awk -F: '/^fpr:/ {print $10; exit}')" \
+    && [ "${ACTUAL_HASHICORP_FPR}" = "${EXPECTED_HASHICORP_FPR}" ] \
     && curl -fsSL "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_${TF_ARCH}.zip" -o /tmp/terraform.zip \
     && curl -fsSL "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_SHA256SUMS" -o /tmp/terraform_SHA256SUMS \
     && curl -fsSL "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_SHA256SUMS.sig" -o /tmp/terraform_SHA256SUMS.sig \
