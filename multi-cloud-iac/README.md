@@ -4,25 +4,25 @@ Starter project for a Dev Container-based Terraform development environment targ
 
 ## What this includes
 
-- Dev Container configuration in `/home/runner/work/Azure-Studies/Azure-Studies/multi-cloud-iac/.devcontainer`
-- Terraform starter configuration in `/home/runner/work/Azure-Studies/Azure-Studies/multi-cloud-iac/terraform`
+- Dev Container configuration in `.devcontainer`
+- Terraform starter configuration in `terraform`
 - Provider and variable scaffolding for all three clouds
 
 ## Quick start
 
-1. Open `/home/runner/work/Azure-Studies/Azure-Studies/multi-cloud-iac` in VS Code.
+1. Open the `multi-cloud-iac` folder in VS Code.
 2. Reopen in Container when prompted.
 3. In the container terminal:
    - `terraform -version`
    - `az version`
    - `aws --version`
    - `gcloud --version`
-4. Go to `/home/runner/work/Azure-Studies/Azure-Studies/multi-cloud-iac/terraform` and run:
+4. Go to `terraform` and run:
    - `terraform init`
    - `terraform validate`
 
 ## Next steps
 
-- Add reusable modules under `/home/runner/work/Azure-Studies/Azure-Studies/multi-cloud-iac/terraform/modules`
+- Add reusable modules under `terraform/modules`
 - Add environment-specific variable files
 - Add CI to run `terraform fmt -check`, `terraform validate`, and `terraform plan`
