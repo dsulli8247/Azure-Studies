@@ -1,0 +1,18 @@
+{
+  "name": "multi-cloud-iac",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": "."
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "hashicorp.terraform",
+        "ms-azuretools.vscode-azureterraform",
+        "amazonwebservices.aws-toolkit-vscode",
+        "googlecloudtools.cloudcode"
+      ]
+    }
+  },
+  "remoteUser": "vscode"
+}
