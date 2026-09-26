@@ -16,9 +16,11 @@ RUN set -eux \
 
 RUN set -eux \
     && TERRAFORM_VERSION="1.9.8" \
+    && TERRAFORM_SHA256_AMD64="186e0145f5e5f2eb97cbd785bc78f21bae4ef15119349f6ad4fa535b83b10df8" \
+    && TERRAFORM_SHA256_ARM64="f85868798834558239f6148834884008f2722548f84034c9b0f62934b2d73ebb" \
     && ARCH="$(dpkg --print-architecture)" \
-    && if [ "${ARCH}" = "amd64" ]; then TF_ARCH="amd64"; EXPECTED_TERRAFORM_SHA256="186e0145f5e5f2eb97cbd785bc78f21bae4ef15119349f6ad4fa535b83b10df8"; \
-       elif [ "${ARCH}" = "arm64" ]; then TF_ARCH="arm64"; EXPECTED_TERRAFORM_SHA256="f85868798834558239f6148834884008f2722548f84034c9b0f62934b2d73ebb"; \
+    && if [ "${ARCH}" = "amd64" ]; then TF_ARCH="amd64"; EXPECTED_TERRAFORM_SHA256="${TERRAFORM_SHA256_AMD64}"; \
+       elif [ "${ARCH}" = "arm64" ]; then TF_ARCH="arm64"; EXPECTED_TERRAFORM_SHA256="${TERRAFORM_SHA256_ARM64}"; \
        else echo "Unsupported architecture: ${ARCH}" && exit 1; fi \
     && curl -fsSL "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_${TF_ARCH}.zip" -o /tmp/terraform.zip \
     && echo "${EXPECTED_TERRAFORM_SHA256}  /tmp/terraform.zip" | sha256sum -c - \
