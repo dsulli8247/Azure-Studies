@@ -20,11 +20,14 @@ RUN set -eux \
     && if [ "${ARCH}" = "amd64" ]; then TF_ARCH="amd64"; \
        elif [ "${ARCH}" = "arm64" ]; then TF_ARCH="arm64"; \
        else echo "Unsupported architecture: ${ARCH}" && exit 1; fi \
+    && curl -fsSL https://apt.releases.hashicorp.com/gpg | gpg --dearmor >/tmp/hashicorp-keyring.gpg \
     && curl -fsSL "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_${TF_ARCH}.zip" -o /tmp/terraform.zip \
     && curl -fsSL "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_SHA256SUMS" -o /tmp/terraform_SHA256SUMS \
+    && curl -fsSL "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_SHA256SUMS.sig" -o /tmp/terraform_SHA256SUMS.sig \
+    && gpg --batch --no-default-keyring --keyring /tmp/hashicorp-keyring.gpg --verify /tmp/terraform_SHA256SUMS.sig /tmp/terraform_SHA256SUMS \
     && grep "terraform_${TERRAFORM_VERSION}_linux_${TF_ARCH}.zip" /tmp/terraform_SHA256SUMS | sha256sum -c - \
     && unzip -q /tmp/terraform.zip -d /usr/local/bin \
-    && rm -f /tmp/terraform.zip /tmp/terraform_SHA256SUMS
+    && rm -f /tmp/terraform.zip /tmp/terraform_SHA256SUMS /tmp/terraform_SHA256SUMS.sig /tmp/hashicorp-keyring.gpg
 
 RUN set -eux \
     && curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor >/usr/share/keyrings/microsoft-archive-keyring.gpg \
