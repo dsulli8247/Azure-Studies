@@ -15,4 +15,8 @@ terraform {
       version = "~> 6.0"
     }
   }
+
+  provider "azurerm" {
+    features {}
+  }
 }
