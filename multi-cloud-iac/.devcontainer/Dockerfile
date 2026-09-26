@@ -22,8 +22,9 @@ RUN set -eux \
        elif [ "${ARCH}" = "arm64" ]; then TF_ARCH="arm64"; \
        else echo "Unsupported architecture: ${ARCH}" && exit 1; fi \
     && curl -fsSL https://apt.releases.hashicorp.com/gpg | gpg --dearmor >/tmp/hashicorp-keyring.gpg \
-    && ACTUAL_HASHICORP_FPR="$(gpg --show-keys --with-colons /tmp/hashicorp-keyring.gpg | awk -F: '/^fpr:/ {print $10; exit}')" \
-    && [ "${ACTUAL_HASHICORP_FPR}" = "${EXPECTED_HASHICORP_FPR}" ] \
+    && read -r HASHICORP_PRIMARY_KEY_COUNT HASHICORP_PRIMARY_FPR < <(gpg --show-keys --with-colons /tmp/hashicorp-keyring.gpg | awk -F: '$1 == "pub" {want_fpr = 1; next} want_fpr && $1 == "fpr" {count++; if (count == 1) {first = $10}; want_fpr = 0} END {print count + 0, first}') \
+    && [ "${HASHICORP_PRIMARY_KEY_COUNT}" -eq 1 ] \
+    && [ "${HASHICORP_PRIMARY_FPR}" = "${EXPECTED_HASHICORP_FPR}" ] \
     && curl -fsSL "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_${TF_ARCH}.zip" -o /tmp/terraform.zip \
     && curl -fsSL "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_SHA256SUMS" -o /tmp/terraform_SHA256SUMS \
     && curl -fsSL "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_SHA256SUMS.sig" -o /tmp/terraform_SHA256SUMS.sig \
@@ -37,9 +38,9 @@ RUN set -eux \
     && AZ_REPO="$(lsb_release -cs)" \
     && if [ "${AZ_REPO}" != "jammy" ] && [ "${AZ_REPO}" != "noble" ]; then AZ_REPO="jammy"; fi \
     && curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor >/usr/share/keyrings/microsoft-archive-keyring.gpg \
-    && gpg --show-keys --with-colons /usr/share/keyrings/microsoft-archive-keyring.gpg \
-       | awk -F: '$1 == "fpr" {print $10}' \
-       | grep -Fxq "${EXPECTED_MICROSOFT_FPR}" \
+    && read -r MICROSOFT_PRIMARY_KEY_COUNT MICROSOFT_PRIMARY_FPR < <(gpg --show-keys --with-colons /usr/share/keyrings/microsoft-archive-keyring.gpg | awk -F: '$1 == "pub" {want_fpr = 1; next} want_fpr && $1 == "fpr" {count++; if (count == 1) {first = $10}; want_fpr = 0} END {print count + 0, first}') \
+    && [ "${MICROSOFT_PRIMARY_KEY_COUNT}" -eq 1 ] \
+    && [ "${MICROSOFT_PRIMARY_FPR}" = "${EXPECTED_MICROSOFT_FPR}" ] \
     && ARCH="$(dpkg --print-architecture)" \
     && echo "deb [arch=${ARCH} signed-by=/usr/share/keyrings/microsoft-archive-keyring.gpg] https://packages.microsoft.com/repos/azure-cli/ ${AZ_REPO} main" >/etc/apt/sources.list.d/azure-cli.list \
     && apt-get update \
@@ -54,9 +55,9 @@ RUN set -eux \
 RUN set -eux \
     && EXPECTED_GCLOUD_FPR="35BAA0B33E9EB396F59CA838C0BA5CE6DC6315A3" \
     && curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor >/usr/share/keyrings/cloud.google.gpg \
-    && gpg --show-keys --with-colons /usr/share/keyrings/cloud.google.gpg \
-       | awk -F: '$1 == "fpr" {print $10}' \
-       | grep -Fxq "${EXPECTED_GCLOUD_FPR}" \
+    && read -r GCLOUD_PRIMARY_KEY_COUNT GCLOUD_PRIMARY_FPR < <(gpg --show-keys --with-colons /usr/share/keyrings/cloud.google.gpg | awk -F: '$1 == "pub" {want_fpr = 1; next} want_fpr && $1 == "fpr" {count++; if (count == 1) {first = $10}; want_fpr = 0} END {print count + 0, first}') \
+    && [ "${GCLOUD_PRIMARY_KEY_COUNT}" -eq 1 ] \
+    && [ "${GCLOUD_PRIMARY_FPR}" = "${EXPECTED_GCLOUD_FPR}" ] \
     && echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" >/etc/apt/sources.list.d/google-cloud-sdk.list \
     && apt-get update \
     && apt-get install -y --no-install-recommends google-cloud-cli \

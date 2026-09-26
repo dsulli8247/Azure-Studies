@@ -1,3 +1,8 @@
+variable "azure_subscription_id" {
+  description = "Azure subscription ID used by the AzureRM provider."
+  type        = string
+}
+
 variable "aws_region" {
   description = "Default AWS region for resources."
   type        = string
