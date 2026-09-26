@@ -15,11 +15,16 @@ RUN set -eux \
     && rm -rf /var/lib/apt/lists/*
 
 RUN set -eux \
-    && curl -fsSL https://apt.releases.hashicorp.com/gpg | gpg --dearmor >/usr/share/keyrings/hashicorp-archive-keyring.gpg \
-    && echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" >/etc/apt/sources.list.d/hashicorp.list \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends terraform \
-    && rm -rf /var/lib/apt/lists/*
+    && TERRAFORM_VERSION="1.9.8" \
+    && ARCH="$(dpkg --print-architecture)" \
+    && if [ "${ARCH}" = "amd64" ]; then TF_ARCH="amd64"; \
+       elif [ "${ARCH}" = "arm64" ]; then TF_ARCH="arm64"; \
+       else echo "Unsupported architecture: ${ARCH}" && exit 1; fi \
+    && curl -fsSL "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_${TF_ARCH}.zip" -o /tmp/terraform.zip \
+    && curl -fsSL "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_SHA256SUMS" -o /tmp/terraform_SHA256SUMS \
+    && grep "terraform_${TERRAFORM_VERSION}_linux_${TF_ARCH}.zip" /tmp/terraform_SHA256SUMS | sha256sum -c - \
+    && unzip -q /tmp/terraform.zip -d /usr/local/bin \
+    && rm -f /tmp/terraform.zip /tmp/terraform_SHA256SUMS
 
 RUN set -eux \
     && curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor >/usr/share/keyrings/microsoft-archive-keyring.gpg \

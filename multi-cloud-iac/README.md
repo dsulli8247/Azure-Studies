@@ -17,9 +17,10 @@ Starter project for a Dev Container-based Terraform development environment targ
    - `az version`
    - `aws --version`
    - `gcloud --version`
+   - Authenticate as needed: `az login`, `aws configure`, `gcloud auth application-default login`
 4. Go to `terraform` and run:
    - `cp terraform.tfvars.example terraform.tfvars`
-   - Edit `terraform.tfvars` and set `gcp_project_id` (and Azure IDs if your environment requires explicit provider values)
+   - Edit `terraform.tfvars` and set `gcp_project_id`
    - `terraform init`
    - `terraform validate`
 
