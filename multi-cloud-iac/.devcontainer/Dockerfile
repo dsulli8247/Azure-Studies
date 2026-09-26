@@ -33,7 +33,10 @@ RUN set -eux \
     && rm -f /tmp/terraform.zip /tmp/terraform_SHA256SUMS /tmp/terraform_SHA256SUMS.sig /tmp/hashicorp-keyring.gpg
 
 RUN set -eux \
+    && EXPECTED_MICROSOFT_FPR="BC528686B50D79E339D3721CEB3E94ADBE1229CF" \
     && curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor >/usr/share/keyrings/microsoft-archive-keyring.gpg \
+    && ACTUAL_MICROSOFT_FPR="$(gpg --show-keys --with-colons /usr/share/keyrings/microsoft-archive-keyring.gpg | awk -F: '/^fpr:/ {print $10; exit}')" \
+    && [ "${ACTUAL_MICROSOFT_FPR}" = "${EXPECTED_MICROSOFT_FPR}" ] \
     && ARCH="$(dpkg --print-architecture)" \
     && AZ_REPO="$(lsb_release -cs)" \
     && echo "deb [arch=${ARCH} signed-by=/usr/share/keyrings/microsoft-archive-keyring.gpg] https://packages.microsoft.com/repos/azure-cli/ ${AZ_REPO} main" >/etc/apt/sources.list.d/azure-cli.list \
