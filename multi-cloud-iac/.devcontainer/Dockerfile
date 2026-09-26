@@ -28,7 +28,7 @@ RUN set -eux \
     && curl -fsSL "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_SHA256SUMS" -o /tmp/terraform_SHA256SUMS \
     && curl -fsSL "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_SHA256SUMS.sig" -o /tmp/terraform_SHA256SUMS.sig \
     && gpg --batch --no-default-keyring --keyring /tmp/hashicorp-keyring.gpg --verify /tmp/terraform_SHA256SUMS.sig /tmp/terraform_SHA256SUMS \
-    && grep -E "^[a-f0-9]{64}[[:space:]]+terraform_${TERRAFORM_VERSION}_linux_${TF_ARCH}\\.zip$" /tmp/terraform_SHA256SUMS | sha256sum -c - \
+    && grep -E "^[a-f0-9]{64}[[:space:]]+\\*?terraform_${TERRAFORM_VERSION}_linux_${TF_ARCH}\\.zip$" /tmp/terraform_SHA256SUMS | sha256sum -c - \
     && unzip -q /tmp/terraform.zip -d /usr/local/bin \
     && rm -f /tmp/terraform.zip /tmp/terraform_SHA256SUMS /tmp/terraform_SHA256SUMS.sig /tmp/hashicorp-keyring.gpg
 
@@ -47,7 +47,10 @@ RUN set -eux \
     && rm -rf /var/lib/apt/lists/*
 
 RUN set -eux \
+    && EXPECTED_GCLOUD_FPR="35BAA0B33E9EB396F59CA838C0BA5CE6DC6315A3" \
     && curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor >/usr/share/keyrings/cloud.google.gpg \
+    && ACTUAL_GCLOUD_FPR="$(gpg --show-keys --with-colons /usr/share/keyrings/cloud.google.gpg | awk -F: '/^fpr:/ {print $10; exit}')" \
+    && [ "${ACTUAL_GCLOUD_FPR}" = "${EXPECTED_GCLOUD_FPR}" ] \
     && echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" >/etc/apt/sources.list.d/google-cloud-sdk.list \
     && apt-get update \
     && apt-get install -y --no-install-recommends google-cloud-cli \
