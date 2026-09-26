@@ -28,7 +28,7 @@ RUN set -eux \
     && curl -fsSL "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_SHA256SUMS" -o /tmp/terraform_SHA256SUMS \
     && curl -fsSL "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_SHA256SUMS.sig" -o /tmp/terraform_SHA256SUMS.sig \
     && gpg --batch --no-default-keyring --keyring /tmp/hashicorp-keyring.gpg --verify /tmp/terraform_SHA256SUMS.sig /tmp/terraform_SHA256SUMS \
-    && grep "terraform_${TERRAFORM_VERSION}_linux_${TF_ARCH}.zip" /tmp/terraform_SHA256SUMS | sha256sum -c - \
+    && grep -E "^[a-f0-9]{64}[[:space:]]+terraform_${TERRAFORM_VERSION}_linux_${TF_ARCH}\\.zip$" /tmp/terraform_SHA256SUMS | sha256sum -c - \
     && unzip -q /tmp/terraform.zip -d /usr/local/bin \
     && rm -f /tmp/terraform.zip /tmp/terraform_SHA256SUMS /tmp/terraform_SHA256SUMS.sig /tmp/hashicorp-keyring.gpg
 

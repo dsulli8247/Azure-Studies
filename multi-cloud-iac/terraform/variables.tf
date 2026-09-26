@@ -1,9 +1,3 @@
-variable "azure_location" {
-  description = "Default Azure location for resources."
-  type        = string
-  default     = "eastus"
-}
-
 variable "aws_region" {
   description = "Default AWS region for resources."
   type        = string

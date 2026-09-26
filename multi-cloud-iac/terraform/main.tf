@@ -1,7 +1,5 @@
 module "azure" {
   source = "./modules/azure"
-
-  location = var.azure_location
 }
 
 module "aws" {
